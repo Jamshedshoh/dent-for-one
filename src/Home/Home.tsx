@@ -1,4 +1,5 @@
 // Import necessary libraries
+import { Link } from "react-router-dom";
 import { Footer } from "../Footer";
 import { Navbar } from "../Navbar";
 
@@ -40,21 +41,21 @@ const ServicesSection = () => {
       description:
         "Search for dentists, book appointments, access medical records, and more.",
       color: "blue",
-      href: "/patient",
+      href: "patient",
     },
     {
       title: "Dentists",
       description:
         "Manage your practice, schedule appointments, and interact with patients seamlessly.",
-      color: "green",
-      href: "/dentist",
+      color: "blue",
+      href: "dentist",
     },
     {
       title: "Business",
       description:
         "Showcase and sell dental products, track sales, and expand your reach.",
-      color: "purple",
-      href: "/business",
+      color: "blue",
+      href: "business",
     },
   ];
 
@@ -77,12 +78,12 @@ const ServicesSection = () => {
                 <p className="text-gray-600 mt-2">{card.description}</p>
               </div>
               <div className="p-4">
-                <a
-                  href={card.href}
+                <Link
+                  to={card.href}
                   className={`mt-4 px-6 py-2 bg-${card.color}-600 text-white rounded-lg hover:bg-${card.color}-700`}
                 >
                   Learn More
-                </a>
+                </Link>
               </div>
             </div>
           ))}

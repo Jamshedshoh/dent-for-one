@@ -23,17 +23,17 @@ import {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Router>
+    <Router basename="dent">
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/patient" element={<Patient />} />
-        <Route path="/dentist" element={<Dentist />} />
-        <Route path="/business" element={<Business />} />
-        <Route path="/dashboard" element={<Dashboard />}>
+        <Route index element={<Home />} />
+        <Route path="shop" element={<Shop />} />
+        <Route path="community" element={<Community />} />
+        <Route path="blog" element={<Blog />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="patient" element={<Patient />} />
+        <Route path="dentist" element={<Dentist />} />
+        <Route path="business" element={<Business />} />
+        <Route path="dashboard" element={<Dashboard />}>
           <Route path="overview" element={<Overview />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="billing" element={<Billing />} />

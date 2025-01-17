@@ -1,4 +1,5 @@
-import { ShoppingCart, Search, User, Heart } from "lucide-react";
+import { ShoppingCart, Search, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Navbar Component
 export const Navbar = () => {
@@ -6,24 +7,24 @@ export const Navbar = () => {
     <nav className="bg-white shadow-md py-4 px-6 fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-2xl font-bold text-blue-600">
-          <a href="/">Dent</a>
+          <Link to="/">Dent</Link>
         </div>
         <div className="space-x-6 flex items-center">
-          <a href="/" className="text-gray-700 hover:text-blue-600">
+          <Link to="/" className="text-gray-700 hover:text-blue-600">
             Home
-          </a>
-          <a href="/shop" className="text-gray-700 hover:text-blue-600">
+          </Link>
+          <Link to="/shop" className="text-gray-700 hover:text-blue-600">
             Shop
-          </a>
-          <a href="/community" className="text-gray-700 hover:text-blue-600">
+          </Link>
+          <Link to="/community" className="text-gray-700 hover:text-blue-600">
             Community
-          </a>
-          <a href="/blog" className="text-gray-700 hover:text-blue-600">
+          </Link>
+          <Link to="/blog" className="text-gray-700 hover:text-blue-600">
             Blog
-          </a>
-          <a href="/contact" className="text-gray-700 hover:text-blue-600">
+          </Link>
+          <Link to="/contact" className="text-gray-700 hover:text-blue-600">
             Contact
-          </a>
+          </Link>
           <div className="flex space-x-4">
             <button className="text-gray-700 hover:text-blue-600">
               <Search className="w-5 h-5" />
@@ -31,9 +32,9 @@ export const Navbar = () => {
             <button className="text-gray-700 hover:text-blue-600">
               <ShoppingCart className="w-5 h-5" />
             </button>
-            <a href="/dashboard" className="text-gray-700 hover:text-blue-600">
+            <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
               <User className="w-5 h-5" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
