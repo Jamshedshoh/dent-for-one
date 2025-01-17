@@ -44,7 +44,7 @@ const FeaturedProducts = () => {
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
               <img
-                src={`https://via.placeholder.com/300?text=Product+${idx + 1}`}
+                src={`https://picsum.photos/id/${idx + 50}/300`}
                 alt={`Product ${idx + 1}`}
                 className="w-full h-48 object-cover"
               />
