@@ -33,9 +33,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/patient" element={<Patient />} />
         <Route path="/dentist" element={<Dentist />} />
         <Route path="/business" element={<Business />} />
-        {/* Parent Dashboard route */}
         <Route path="/dashboard" element={<Dashboard />}>
-          {/* Nested sub-routes for Dashboard */}
           <Route path="overview" element={<Overview />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="billing" element={<Billing />} />
