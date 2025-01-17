@@ -41,21 +41,21 @@ const ServicesSection = () => {
       description:
         "Search for dentists, book appointments, access medical records, and more.",
       color: "blue",
-      href: "patient",
+      href: "/patient",
     },
     {
       title: "Dentists",
       description:
         "Manage your practice, schedule appointments, and interact with patients seamlessly.",
       color: "blue",
-      href: "dentist",
+      href: "/dentist",
     },
     {
       title: "Business",
       description:
         "Showcase and sell dental products, track sales, and expand your reach.",
       color: "blue",
-      href: "business",
+      href: "/business",
     },
   ];
 
