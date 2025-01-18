@@ -15,23 +15,6 @@ export const Shop = () => {
   );
 };
 
-// Mock Data for Categories and Campaigns
-// const categories = ["All", "Electronics", "Furniture", "Apparel", "Books", "Toys"];
-const campaigns = [
-  {
-    id: 1,
-    title: "Winter Essentials Bundle",
-    description: "Get 20% off on all winter wear and accessories.",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    title: "Home Office Setup",
-    description: "Save 15% on desks and ergonomic chairs.",
-    image: "https://via.placeholder.com/150",
-  },
-];
-
 const products = [
   { id: 1, name: "Smartphone", category: "Electronics" },
   { id: 2, name: "Sofa", category: "Furniture" },
@@ -228,7 +211,7 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="relative bg-blue-600 pt-32">
+    <div className="relative pt-32">
       <div className="relative w-full mx-auto overflow-hidden rounded-lg">
         <div
           className="flex transition-transform duration-500"
