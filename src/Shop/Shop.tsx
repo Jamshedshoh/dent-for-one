@@ -131,7 +131,7 @@ export const SubNavbar = () => {
   };
 
   return (
-    <div className="bg-white shadow-md mt-12 py-4 fixed top-0 left-0 right-0 z-40">
+    <div className="bg-white shadow-md mt-14 py-2 fixed top-0 left-0 right-0 z-40">
       <div className="sub-navbar bg-gray-100 py-2 shadow-md relative">
         <div className="container mx-auto px-4">
           <div className="flex space-x-4">
@@ -160,7 +160,7 @@ export const SubNavbar = () => {
 
 const LargePane = ({ category }: any) => {
   return (
-    <div className="absolute left-0 mt-2 w-full bg-white shadow-lg py-4">
+    <div className="absolute left-0 w-full bg-white shadow-lg py-2">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {category.subcategories.map((subcategory: any) => (
