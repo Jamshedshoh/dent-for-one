@@ -2,11 +2,11 @@ import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Import React Router components
-import { Business, Dentist, Home, Patient } from "./Home";
-import { Shop } from "./Shop";
-import { Community } from "./Community";
-import { Contact } from "./Contact";
-import { Blog } from "./Blog";
+import { Business, Dentist, Home, Patient } from "./components/Home";
+import { Shop } from "./components/Shop";
+import { Community } from "./components/Community";
+import { Contact } from "./components/Contact";
+import { Blog } from "./components/Blog";
 import {
   Appointments,
   Billing,
@@ -19,33 +19,76 @@ import {
   Marketing,
   Reports,
   Settings,
-} from "./Dashboard";
+  Products,
+  Orders,
+  Payments,
+} from "./components/Dashboard";
+import { LoginPage, RegisterPage } from "./components/Auth";
+import {
+  AuthProvider,
+  OrdersProvider,
+  PaymentsProvider,
+  ProductsProvider,
+} from "./contexts";
+import { ShopProvider } from "./contexts/ShopContext";
+import { ProductDetails } from "./components/Shop/ProductDetails";
+import { Cart } from "./components/Shop/Cart";
+import { Catalog } from "./components/Shop/Catalog";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Router basename="dent">
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="shop" element={<Shop />} />
-        <Route path="community" element={<Community />} />
-        <Route path="blog" element={<Blog />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="patient" element={<Patient />} />
-        <Route path="dentist" element={<Dentist />} />
-        <Route path="business" element={<Business />} />
-        <Route path="dashboard" element={<Dashboard />}>
-          <Route path="overview" element={<Overview />} />
-          <Route path="appointments" element={<Appointments />} />
-          <Route path="billing" element={<Billing />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="inbox" element={<Inbox />} />
-          <Route path="database" element={<DatabaseManagement />} />
-          <Route path="patients" element={<PatientManagement />} />
-          <Route path="inventory" element={<Inventory />} />
-          <Route path="marketing" element={<Marketing />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <ShopProvider>
+        <Router basename="dent">
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="shop">
+              <Route index element={<Shop />} />
+              <Route path="catalog" element={<Catalog />} />
+              <Route path="products/:id" element={<ProductDetails />} />
+              <Route path="cart" element={<Cart />} />
+            </Route>
+            <Route path="community" element={<Community />} />
+            <Route path="blog" element={<Blog />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="patient" element={<Patient />} />
+            <Route path="dentist" element={<Dentist />} />
+            <Route path="business" element={<Business />} />
+            <Route path="dashboard" element={<Dashboard />}>
+              <Route path="overview" element={<Overview />} />
+              <Route path="inbox" element={<Inbox />} />
+              <Route
+                path="shop/products"
+                element={
+                  <ProductsProvider>
+                    <Products />
+                  </ProductsProvider>
+                }
+              />
+              <Route
+                path="shop/orders"
+                element={
+                  <OrdersProvider>
+                    <Orders />
+                  </OrdersProvider>
+                }
+              />
+              <Route
+                path="shop/payments"
+                element={
+                  <PaymentsProvider>
+                    <Payments />
+                  </PaymentsProvider>
+                }
+              />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ShopProvider>
+    </AuthProvider>
   </StrictMode>
 );
