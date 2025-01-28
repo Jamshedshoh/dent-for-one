@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
@@ -35,7 +35,7 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const { user } = useAuth();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -89,9 +89,9 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching orders:', error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const updateOrderStatus = async (orderId: number, status: Order['status']) => {
+  const updateOrderStatus = useCallback(async (orderId: number, status: Order['status']) => {
     if (!user) return;
     
     try {
@@ -99,7 +99,7 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
         .from('orders')
         .update({ status })
         .eq('id', orderId)
-        .eq('user_id', user.id); // Only update if order belongs to user
+        .eq('user_id', user.id);
 
       if (error) throw error;
       await fetchOrders();
@@ -107,7 +107,7 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating order status:', error);
       throw error;
     }
-  };
+  }, [user, fetchOrders]);
 
   return (
     <OrdersContext.Provider value={{ orders, fetchOrders, updateOrderStatus }}>

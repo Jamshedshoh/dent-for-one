@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import { db } from "../../database/client";
 
 export interface Product {
@@ -26,7 +26,7 @@ const ProductsContext = createContext<ProductsContextType | null>(null);
 export const ProductsProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const { data, error } = await db
         .from('products')
@@ -39,9 +39,9 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching products:', error);
       throw error;
     }
-  };
+  }, []);
 
-  const updateProduct = async (id: number, data: Partial<Product>) => {
+  const updateProduct = useCallback(async (id: number, data: Partial<Product>) => {
     try {
       const { error } = await db
         .from('products')
@@ -54,9 +54,9 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating product:', error);
       throw error;
     }
-  };
+  }, [fetchProducts]);
 
-  const deleteProduct = async (id: number) => {
+  const deleteProduct = useCallback(async (id: number) => {
     try {
       const { error } = await db
         .from('products')
@@ -69,7 +69,7 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting product:', error);
       throw error;
     }
-  };
+  }, [fetchProducts]);
 
   const createProduct = async (data: Omit<Product, 'id' | 'created_at'>) => {
     try {

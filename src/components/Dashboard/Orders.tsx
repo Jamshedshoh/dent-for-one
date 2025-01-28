@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useOrders } from "../../contexts";
 import { Order } from "../../contexts/OrdersContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -7,9 +7,13 @@ export const Orders = () => {
   const { orders, fetchOrders, updateOrderStatus } = useOrders();
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
 
-  useEffect(() => {
+  const handleFetchOrders = useCallback(() => {
     fetchOrders();
-  }, [fetchOrders]);
+  }, []);
+
+  useEffect(() => {
+    handleFetchOrders();
+  }, [handleFetchOrders]);
 
   const toggleOrderExpand = (orderId: number) => {
     setExpandedOrders(prev => 

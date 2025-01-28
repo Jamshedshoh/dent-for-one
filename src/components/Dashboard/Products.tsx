@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useProducts } from "../../contexts";
 import { ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
 import { Product } from "../../contexts/ProductsContext";
@@ -8,9 +8,14 @@ export const Products = () => {
   const [expandedProducts, setExpandedProducts] = useState<number[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
+  // Memoize the fetchProducts function
+  const handleFetchProducts = useCallback(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, []); // Empty dependency array since we don't want to recreate this function
+
+  useEffect(() => {
+    handleFetchProducts();
+  }, [handleFetchProducts]);
 
   const toggleProductExpand = (productId: number) => {
     setExpandedProducts(prev => 
