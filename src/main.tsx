@@ -34,6 +34,8 @@ import { ShopProvider } from "./contexts/ShopContext";
 import { ProductDetails } from "./components/Shop/ProductDetails";
 import { Cart } from "./components/Shop/Cart";
 import { Catalog } from "./components/Shop/Catalog";
+import { Checkout } from "./components/Shop/Checkout";
+import { OrderProvider } from "./contexts/OrderContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -48,7 +50,12 @@ createRoot(document.getElementById("root")!).render(
               <Route index element={<Shop />} />
               <Route path="catalog" element={<Catalog />} />
               <Route path="products/:id" element={<ProductDetails />} />
-              <Route path="cart" element={<Cart />} />
+              <Route path="cart" element={<Cart />} /> 
+              <Route path="checkout" element={
+                <OrderProvider>
+                  <Checkout />
+                </OrderProvider>
+                } />
             </Route>
             <Route path="community" element={<Community />} />
             <Route path="blog" element={<Blog />} />

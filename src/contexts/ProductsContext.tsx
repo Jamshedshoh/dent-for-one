@@ -1,61 +1,98 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { db } from "../../database/client";
 
-export type Product = {
+export interface Product {
   id: number;
   name: string;
   price: number;
   stock: number;
-  status: string;
-};
+  category: string;
+  is_featured: boolean;
+  description?: string;
+  image_url?: string;
+  created_at: string;
+}
 
-type ProductsContextType = {
+interface ProductsContextType {
   products: Product[];
   fetchProducts: () => Promise<void>;
-  addProduct: (product: Omit<Product, "id">) => Promise<void>;
-  updateProduct: (id: number, product: Partial<Product>) => Promise<void>;
+  updateProduct: (id: number, data: Partial<Product>) => Promise<void>;
   deleteProduct: (id: number) => Promise<void>;
-};
+  createProduct: (data: Omit<Product, 'id' | 'created_at'>) => Promise<void>;
+}
 
-const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
+const ProductsContext = createContext<ProductsContextType | null>(null);
 
-export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
+export const ProductsProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
 
-  // Fetch all products from Supabase
   const fetchProducts = async () => {
-    const { data, error } = await db.from("products").select();
-    if (error) console.error("Error fetching products:", error);
-    else setProducts(data || []);
+    try {
+      const { data, error } = await db
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
   };
 
-  // Add a new product
-  const addProduct = async (product: Omit<Product, "id">) => {
-    const { data, error } = await db.from("products").insert(product).select();
-    if (error) console.error("Error adding product:", error);
-    else setProducts((prev) => [...prev, ...(data || [])]);
+  const updateProduct = async (id: number, data: Partial<Product>) => {
+    try {
+      const { error } = await db
+        .from('products')
+        .update(data)
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
   };
 
-  // Update a product
-  const updateProduct = async (id: number, product: Partial<Product>) => {
-    const { data, error } = await db.from("products").update(product).eq("id", id).select();
-    if (error) console.error("Error updating product:", error);
-    else setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...product } : p)));
-  };
-
-  // Delete a product
   const deleteProduct = async (id: number) => {
-    const { error } = await db.from("products").delete().eq("id", id);
-    if (error) console.error("Error deleting product:", error);
-    else setProducts((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const { error } = await db
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
+    }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const createProduct = async (data: Omit<Product, 'id' | 'created_at'>) => {
+    try {
+      const { error } = await db
+        .from('products')
+        .insert(data);
+
+      if (error) throw error;
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
+  };
 
   return (
-    <ProductsContext.Provider value={{ products, fetchProducts, addProduct, updateProduct, deleteProduct }}>
+    <ProductsContext.Provider value={{ 
+      products, 
+      fetchProducts, 
+      updateProduct, 
+      deleteProduct, 
+      createProduct 
+    }}>
       {children}
     </ProductsContext.Provider>
   );
@@ -63,6 +100,8 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
 
 export const useProducts = () => {
   const context = useContext(ProductsContext);
-  if (!context) throw new Error("useProducts must be used within a ProductsProvider");
+  if (!context) {
+    throw new Error("useProducts must be used within a ProductsProvider");
+  }
   return context;
 };

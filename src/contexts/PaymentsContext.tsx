@@ -1,45 +1,72 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { db } from "../../database/client";
+import { useAuth } from "./AuthContext";
 
-type Payment = {
+export interface Payment {
   id: number;
-  customer: string;
+  order_id: number;
   amount: number;
-  date: string;
-  status: string;
-};
+  status: 'pending' | 'completed' | 'failed';
+  payment_method: string;
+  created_at: string;
+  order: {
+    user_id: string;
+    shipping_address: string;
+  };
+}
 
-type PaymentsContextType = {
+interface PaymentsContextType {
   payments: Payment[];
-  addPayment: (payment: Omit<Payment, "id">) => Promise<void>;
   fetchPayments: () => Promise<void>;
-};
+  updatePaymentStatus: (id: number, status: Payment['status']) => Promise<void>;
+}
 
-const PaymentsContext = createContext<PaymentsContextType | undefined>(undefined);
+const PaymentsContext = createContext<PaymentsContextType | null>(null);
 
-export const PaymentsProvider = ({ children }: { children: React.ReactNode }) => {
+export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const { user } = useAuth();
 
-  // Fetch payments from Supabase
   const fetchPayments = async () => {
-    const { data, error } = await db.from("payments").select();
-    if (error) console.error("Error fetching payments:", error);
-    else setPayments(data);
+    if (!user) return;
+
+    try {
+      const { data, error } = await db
+        .from('payments')
+        .select(`
+          *,
+          order:orders (
+            user_id,
+            shipping_address
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPayments(data || []);
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      throw error;
+    }
   };
 
-  // Add a new payment
-  const addPayment = async (payment: Omit<Payment, "id">) => {
-    const { data, error } = await db.from("payments").insert([payment]).select();
-    if (error) console.error("Error adding payment:", error);
-    else setPayments((prev) => [...prev, ...data]);
-  };
+  const updatePaymentStatus = async (id: number, status: Payment['status']) => {
+    try {
+      const { error } = await db
+        .from('payments')
+        .update({ status })
+        .eq('id', id);
 
-  useEffect(() => {
-    fetchPayments();
-  }, []);
+      if (error) throw error;
+      await fetchPayments();
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      throw error;
+    }
+  };
 
   return (
-    <PaymentsContext.Provider value={{ payments, addPayment, fetchPayments }}>
+    <PaymentsContext.Provider value={{ payments, fetchPayments, updatePaymentStatus }}>
       {children}
     </PaymentsContext.Provider>
   );
@@ -47,6 +74,8 @@ export const PaymentsProvider = ({ children }: { children: React.ReactNode }) =>
 
 export const usePayments = () => {
   const context = useContext(PaymentsContext);
-  if (!context) throw new Error("usePayments must be used within a PaymentsProvider");
+  if (!context) {
+    throw new Error("usePayments must be used within a PaymentsProvider");
+  }
   return context;
 };
