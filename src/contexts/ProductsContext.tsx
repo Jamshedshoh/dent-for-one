@@ -4,12 +4,12 @@ import { db } from "../../database/client";
 export interface Product {
   id: number;
   name: string;
+  description?: string;
   price: number;
   stock: number;
   category: string;
-  is_featured: boolean;
-  description?: string;
   image_url?: string;
+  is_featured: boolean;
   created_at: string;
 }
 
@@ -83,6 +83,15 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error creating product:', error);
       throw error;
     }
+  };
+
+  const uploadImage = async (file: File) => {
+    const { data, error } = await db.storage
+      .from("product-images")
+      .upload(`products/${file.name}`, file);
+  
+    if (error) throw error;
+    return data.path;
   };
 
   return (

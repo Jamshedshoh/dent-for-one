@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { usePayments } from "../../contexts";
+import { usePayments } from "../../../contexts";
 import { ChevronDown, ChevronUp, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { Payment } from "../../contexts/PaymentsContext";
+import { Payment } from "../../../contexts/PaymentsContext";
 
 export const Payments = () => {
   const { payments, fetchPayments, updatePaymentStatus } = usePayments();

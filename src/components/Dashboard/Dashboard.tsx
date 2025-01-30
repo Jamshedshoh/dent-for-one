@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { Menu, User } from "lucide-react"; // Icons for navigation
 import { Sidebar } from "../Sidebar";
-import { Navigate, Outlet } from "react-router-dom"; // Import Link and Outlet from react-router-dom
+import { useNavigate, Outlet } from "react-router-dom"; // Import Link and Outlet from react-router-dom
 import { useAuth } from "../../contexts";
 
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const { user } = useAuth();
+  const { user } = useAuth(); 
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    navigate("/login");
+    return null;
   }
 
   return (

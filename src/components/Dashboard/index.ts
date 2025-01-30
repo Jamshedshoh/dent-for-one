@@ -1,13 +1,7 @@
 export { Dashboard } from "./Dashboard";
 export { Inbox } from "./Inbox";
-export { Appointments } from "./Appointments";
-export { Billing } from "./Billing";
-export { DatabaseManagement } from "./DatabaseManagement";
-export { Inventory } from "./Inventory";
 export { Overview } from "./Overview";
-export { PatientManagement } from "./PatientManagement";
 export { Reports } from "./Reports";
-export { Marketing } from "./Marketing";
 export { Settings } from "./Settings";
 export { Orders } from "./Orders";
 export { Payments } from "./Payments";

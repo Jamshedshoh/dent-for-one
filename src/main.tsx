@@ -6,14 +6,14 @@ import { Business, Dentist, Home, Patient } from "./components/Home";
 import { Shop } from "./components/Shop";
 import { Community } from "./components/Community";
 import { Contact } from "./components/Contact";
-import { Blog } from "./components/Blog";
+import { Blog, Post } from "./components/Blog";
+import { Blog as BlogDashboard } from "./components/Dashboard/Blog";
 import {
   Appointments,
   Billing,
   Dashboard,
   DatabaseManagement,
   Inbox,
-  Inventory,
   Overview,
   PatientManagement,
   Marketing,
@@ -29,6 +29,12 @@ import {
   OrdersProvider,
   PaymentsProvider,
   ProductsProvider,
+  InventoryProvider,
+  CategoriesProvider,
+  DiscountsProvider,
+  SuppliersProvider,
+  PreOrdersProvider,
+  BlogProvider,
 } from "./contexts";
 import { ShopProvider } from "./contexts/ShopContext";
 import { ProductDetails } from "./components/Shop/ProductDetails";
@@ -36,6 +42,11 @@ import { Cart } from "./components/Shop/Cart";
 import { Catalog } from "./components/Shop/Catalog";
 import { Checkout } from "./components/Shop/Checkout";
 import { OrderProvider } from "./contexts/OrderContext";
+import { Suppliers } from "./components/Dashboard/Suppliers";
+import { Categories } from "./components/Dashboard/Categories";
+import { Discounts } from "./components/Dashboard/Discounts";
+import { PreOrders } from "./components/Dashboard/PreOrders";
+import { Inventory } from "./components/Dashboard/Inventory";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -58,7 +69,16 @@ createRoot(document.getElementById("root")!).render(
                 } />
             </Route>
             <Route path="community" element={<Community />} />
-            <Route path="blog" element={<Blog />} />
+            <Route path="blog" element={
+              <BlogProvider>
+                <Blog />
+              </BlogProvider>
+              } />
+            <Route path="blog/:id" element={
+              <BlogProvider>
+                <Post />
+              </BlogProvider>
+              } />
             <Route path="contact" element={<Contact />} />
             <Route path="patient" element={<Patient />} />
             <Route path="dentist" element={<Dentist />} />
@@ -66,6 +86,11 @@ createRoot(document.getElementById("root")!).render(
             <Route path="dashboard" element={<Dashboard />}>
               <Route path="overview" element={<Overview />} />
               <Route path="inbox" element={<Inbox />} />
+              <Route path="blog" element={
+                <BlogProvider>
+                  <BlogDashboard />
+                </BlogProvider>
+                } />
               <Route
                 path="shop/products"
                 element={
@@ -90,8 +115,49 @@ createRoot(document.getElementById("root")!).render(
                   </PaymentsProvider>
                 }
               />
+              <Route
+                path="shop/suppliers"
+                element={
+                  <SuppliersProvider>
+                    <Suppliers />
+                  </SuppliersProvider>
+                }
+              />
+              <Route
+                path="shop/categories"
+                element={
+                  <CategoriesProvider>
+                    <Categories />
+                  </CategoriesProvider>
+                }
+              />
+              <Route
+                path="shop/discounts"
+                element={
+                  <DiscountsProvider>
+                    <Discounts />
+                  </DiscountsProvider>
+                }
+              />
+              <Route
+                path="shop/inventory"
+                element={
+                  <InventoryProvider>
+                    <Inventory />
+                  </InventoryProvider>
+                }
+              />
+              <Route
+                path="shop/pre-orders"
+                element={
+                  <PreOrdersProvider>
+                    <PreOrders />
+                  </PreOrdersProvider>
+                }
+              />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
+              
             </Route>
           </Routes>
         </Router>

@@ -3,19 +3,18 @@ import {
   X,
   Home,
   User,
-  Calendar,
-  CreditCard,
   LogOut,
-  Database,
   File,
   Box,
   Settings2,
   Mail,
-  Siren,
   ShoppingCart,
   Package,
   DollarSign,
   ChevronDown,
+  Truck,
+  List,
+  Percent,
 } from "lucide-react"; // Icons for navigation
 import { Link } from "react-router-dom"; // Import Link
 import { useAuth } from "../contexts";
@@ -28,8 +27,8 @@ export type SidebarProps = {
 };
 
 export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
-  const { user, logout }: any = useAuth();
-  const [shopOpen, setShopOpen] = useState(false); // State for Shop dropdown
+  const { user, logout, isAllowed }: any = useAuth();
+  const [shopOpen, setShopOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,15 +59,6 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
 
   return (
     <>
-      {/* Backdrop */}
-      {/* <div
-        id="backdrop"
-        className={`fixed inset-0 z-40 transition-all duration-300 ${
-          isOpen ? "bg-gray-900 bg-opacity-50" : "bg-transparent"
-        }`}
-        onClick={toggleSidebar}
-      ></div> */}
-
       {/* Sidebar */}
       <div
         id="sidebar"
@@ -108,21 +98,13 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
             <Mail className="w-6 h-6" /> <span>Inbox</span>
           </Link>
 
-          {/* <Link
-            to="appointments"
+          <Link
+            to="blog"
             className="flex items-center space-x-2 text-gray-800 hover:text-blue-600"
             onClick={handleLinkClick}
           >
-            <Calendar className="w-6 h-6" /> <span>Appointments</span>
-          </Link> */}
-
-          {/* <Link
-            to="billing"
-            className="flex items-center space-x-2 text-gray-800 hover:text-blue-600"
-            onClick={handleLinkClick}
-          >
-            <CreditCard className="w-6 h-6" /> <span>Billing</span>
-          </Link> */}
+            <File className="w-6 h-6" /> <span>Blog</span>
+          </Link>
 
           <button
             className="flex items-center justify-between w-full text-gray-800 hover:text-blue-600"
@@ -131,30 +113,77 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
             <div className="flex items-center space-x-2">
               <ShoppingCart className="w-6 h-6" /> <span>Shop</span>
             </div>
-            <ChevronDown className={`w-5 h-5 transition-transform ${shopOpen ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`w-5 h-5 transition-transform ${
+                shopOpen ? "rotate-180" : ""
+              }`}
+            />
           </button>
           {shopOpen && (
             <div className="ml-6 flex flex-col space-y-2">
+              {isAllowed("products", "view") && (
+                <Link
+                  to="shop/products"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                  onClick={handleLinkClick}
+                >
+                  <Package className="w-5 h-5" /> <span>Products</span>
+                </Link>
+              )}
+
+              {isAllowed("orders", "view") && (
+                <Link
+                  to="shop/orders"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                  onClick={handleLinkClick}
+                >
+                  <Box className="w-5 h-5" /> <span>Orders</span>
+                </Link>
+              )}
+
+              {isAllowed("payments", "view") && (
+                <Link
+                  to="shop/payments"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                  onClick={handleLinkClick}
+                >
+                  <DollarSign className="w-5 h-5" /> <span>Payments</span>
+                </Link>
+              )}
               <Link
-                to="shop/products"
+                to="shop/suppliers"
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
                 onClick={handleLinkClick}
               >
-                <Package className="w-5 h-5" /> <span>Products</span>
+                <Truck className="w-5 h-5" /> <span>Suppliers</span>
               </Link>
               <Link
-                to="shop/orders"
+                to="shop/categories"
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
                 onClick={handleLinkClick}
               >
-                <Box className="w-5 h-5" /> <span>Orders</span>
+                <List className="w-5 h-5" /> <span>Categories</span>
               </Link>
               <Link
-                to="shop/payments"
+                to="shop/discounts"
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
                 onClick={handleLinkClick}
               >
-                <DollarSign className="w-5 h-5" /> <span>Payments</span>
+                <Percent className="w-5 h-5" /> <span>Discounts</span>
+              </Link>
+              <Link
+                to="shop/inventory"
+                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                onClick={handleLinkClick}
+              >
+                <Box className="w-5 h-5" /> <span>Inventory</span>
+              </Link>
+              <Link
+                to="shop/pre-orders"
+                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                onClick={handleLinkClick}
+              >
+                <Box className="w-5 h-5" /> <span>Pre-Orders</span>
               </Link>
             </div>
           )}
@@ -166,14 +195,6 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
           >
             <File className="w-6 h-6" /> <span>Reports</span>
           </Link>
-
-          {/* <Link
-            to="database"
-            className="flex items-center space-x-2 text-gray-800 hover:text-blue-600"
-            onClick={handleLinkClick}
-          >
-            <Database className="w-6 h-6" /> <span>Database Management</span>
-          </Link> */}
 
           <Link
             to="settings"
