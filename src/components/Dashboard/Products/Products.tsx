@@ -36,7 +36,6 @@ export const Products = () => {
       try {
         await createProduct({
           ...productData,
-          category: "",
           is_featured: false,
         });
         setIsAddFormOpen(false);
