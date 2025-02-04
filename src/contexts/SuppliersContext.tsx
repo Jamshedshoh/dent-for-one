@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 interface Supplier {
@@ -28,7 +28,9 @@ export const SuppliersProvider = ({ children }: { children: ReactNode }) => {
     setSuppliers(data || []);
   }, []);
 
-  fetchSuppliers();
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   const addSupplier = async (supplier: Omit<Supplier, "id">) => {
     const { data, error } = await db.from("suppliers").insert(supplier).single();

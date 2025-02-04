@@ -9,6 +9,7 @@ export const Suppliers = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedSupplier, setExpandedSupplier] = useState<number | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<number | null>(null);
 
   const filteredSuppliers = suppliers.filter((supplier) =>
     supplier?.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -34,6 +35,15 @@ export const Suppliers = () => {
       setIsAdding(false);
     } catch (error) {
       console.error("Error saving supplier:", error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteSupplier(id);
+      setDeleteConfirmation(null);
+    } catch (error) {
+      console.error("Error deleting supplier:", error);
     }
   };
 
@@ -67,63 +77,93 @@ export const Suppliers = () => {
         </div>
 
         {/* Suppliers List */}
-        <div className="space-y-4">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
           {filteredSuppliers.map((supplier) => (
-            <div key={supplier.id} className="bg-white rounded-lg shadow">
-              <div
-                className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
-                onClick={() =>
-                  setExpandedSupplier(
-                    expandedSupplier === supplier.id ? null : supplier.id
-                  )
-                }
-              >
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-800">{supplier.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    {supplier.contact_email}
-                  </p>
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 text-gray-500 transition-transform ${
-                    expandedSupplier === supplier.id ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-
-              {expandedSupplier === supplier.id && (
-                <div className="p-4 pt-0 border-t border-gray-100">
-                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                    <div>
-                      <span className="font-medium">Phone:</span>{" "}
-                      {supplier.phone}
-                    </div>
-                    <div>
-                      <span className="font-medium">Address:</span>{" "}
-                      {supplier.address}
-                    </div>
+            <div key={supplier.id} className="border-b last:border-b-0">
+              <div className="p-4 hover:bg-gray-50 cursor-pointer">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-medium text-gray-800">{supplier.name}</h3>
+                    <p className="text-sm text-gray-600">
+                      {supplier.contact_email}
+                    </p>
                   </div>
-                  <div className="mt-4 flex space-x-2">
+                  <div className="flex items-center space-x-4">
                     <button
                       onClick={() => setEditId(supplier.id)}
-                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+                      className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
                     >
                       <Edit className="w-4 h-4" />
-                      <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => deleteSupplier(supplier.id)}
-                      className="flex items-center space-x-1 text-red-600 hover:text-red-800"
+                      onClick={() => setDeleteConfirmation(supplier.id)}
+                      className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors"
                     >
                       <Trash className="w-4 h-4" />
-                      <span>Delete</span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        setExpandedSupplier(
+                          expandedSupplier === supplier.id ? null : supplier.id
+                        )
+                      }
+                      className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          expandedSupplier === supplier.id ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
                   </div>
                 </div>
-              )}
+
+                {expandedSupplier === supplier.id && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                      <div>
+                        <span className="font-medium">Phone:</span>{" "}
+                        {supplier.phone}
+                      </div>
+                      <div>
+                        <span className="font-medium">Address:</span>{" "}
+                        {supplier.address}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirmation !== null && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete this supplier? This action cannot be undone.
+                </p>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setDeleteConfirmation(null)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleDelete(deleteConfirmation)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                  >
+                    Delete Supplier
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Add/Edit Modal */}
         {(isAdding || editId !== null) && (

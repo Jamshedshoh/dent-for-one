@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 interface Category {
@@ -25,8 +25,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     setCategories(data || []);
   }, []);
 
-  fetchCategories();
-
   const addCategory = async (name: string) => {
     const { data, error } = await db.from("categories").insert({ name }).single();
     if (error) throw error;
@@ -44,6 +42,10 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
     setCategories((prev) => prev.filter((c) => c.id !== id));
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <CategoriesContext.Provider

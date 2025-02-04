@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 interface Discount {
@@ -39,6 +39,10 @@ export const DiscountsProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
     setDiscounts((prev) => prev.filter((d) => d.id !== id));
   };
+
+  useEffect(() => {
+    fetchDiscounts();
+  }, [fetchDiscounts]);
 
   return (
     <DiscountsContext.Provider

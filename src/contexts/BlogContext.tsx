@@ -2,7 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
-interface BlogPost {
+export interface BlogPost {
   id: number;
   title: string;
   content: string;

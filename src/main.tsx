@@ -95,7 +95,9 @@ createRoot(document.getElementById("root")!).render(
                 path="shop/products"
                 element={
                   <ProductsProvider>
-                    <Products />
+                    <CategoriesProvider>
+                      <Products />
+                    </CategoriesProvider>
                   </ProductsProvider>
                 }
               />

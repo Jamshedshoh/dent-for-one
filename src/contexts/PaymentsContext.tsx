@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
@@ -64,6 +64,10 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
   return (
     <PaymentsContext.Provider value={{ payments, fetchPayments, updatePaymentStatus }}>

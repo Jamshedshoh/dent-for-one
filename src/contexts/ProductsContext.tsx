@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 export interface Product {
@@ -40,6 +40,10 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const updateProduct = useCallback(async (id: number, data: Partial<Product>) => {
     try {

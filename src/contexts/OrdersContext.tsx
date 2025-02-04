@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
@@ -108,6 +108,10 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   }, [user, fetchOrders]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   return (
     <OrdersContext.Provider value={{ orders, fetchOrders, updateOrderStatus }}>

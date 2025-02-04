@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 interface PreOrder {
@@ -45,6 +45,10 @@ export const PreOrdersProvider = ({ children }: { children: ReactNode }) => {
       prev.map((p) => (p.id === id ? { ...p, ...data } : p))
     );
   };
+
+  useEffect(() => {
+    fetchPreOrders();
+  }, [fetchPreOrders]);
 
   return (
     <PreOrdersContext.Provider

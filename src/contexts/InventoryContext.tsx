@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 import { db } from "../../database/client";
 
 interface Inventory {
@@ -36,6 +36,10 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
     setInventory(data || []);
   }, []);
+
+  useEffect(() => {
+    getStockLevels();
+  }, [getStockLevels]);
 
   return (
     <InventoryContext.Provider value={{ inventory, updateStock, getStockLevels }}>

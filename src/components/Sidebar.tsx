@@ -62,7 +62,7 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
       {/* Sidebar */}
       <div
         id="sidebar"
-        className={`fixed inset-0 z-50 md:z-50 transition-all duration-300 ${
+        className={`fixed inset-0 z-1 md:z-1 transition-all duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 md:flex flex-col bg-white shadow-lg w-full md:w-64 h-full`}
       >
