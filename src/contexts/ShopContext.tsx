@@ -1,8 +1,15 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { db } from "../../database/client";
+import { categories as defaultCategories } from "./data/categories";
 
 export type Product = {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -16,13 +23,33 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface Category {
+  name: string;
+  displayName: string;
+  slug: string;
+  categories: {
+    name: string;
+    displayName: string;
+    slug: string;
+    subcategories: {
+      name: string;
+      displayName: string;
+      slug: string;
+    }[];
+  }[];
+}
+
 interface ShopContextType {
   products: Product[];
   featuredProducts: Product[];
   newArrivals: Product[];
   categories: string[];
+
   filters: { category: string; priceRange: [number, number] };
-  setFilters: (filters: { category: string; priceRange: [number, number] }) => void;
+  setFilters: (filters: {
+    category: string;
+    priceRange: [number, number];
+  }) => void;
   applyFilters: (filteredProducts: Product[]) => Product[];
   cartItems: CartItem[];
   addToCart: (product: Product) => void;
@@ -39,8 +66,11 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [filters, setFilters] = useState<{ category: string; priceRange: [number, number] }>({
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [filters, setFilters] = useState<{
+    category: string;
+    priceRange: [number, number];
+  }>({
     category: "",
     priceRange: [0, 1000],
   });
@@ -59,8 +89,15 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
 
     setProducts(data);
     setFeaturedProducts(data.filter((p) => p.is_featured));
-    setNewArrivals([...data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 10));
-    setCategories([...new Set(data.map((p) => p.category))]);
+    setNewArrivals(
+      [...data]
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+        .slice(0, 10)
+    );
+    // setCategories([...new Set(data.map((p) => p.category))]);
   };
 
   const applyFilters = (filteredProducts: Product[]): Product[] => {
@@ -73,10 +110,10 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addToCart = (product: Product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -87,7 +124,9 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = (productId: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== productId)
+    );
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
@@ -95,8 +134,8 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart(productId);
       return;
     }
-    setCartItems(prevItems =>
-      prevItems.map(item =>
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === productId ? { ...item, quantity } : item
       )
     );
@@ -107,7 +146,10 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
   };
 
   const getCartCount = () => {

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 interface PostCardProps {
   post: {
-    id: number;
+    id: string;
     title: string;
     content: string;
     published_at: string | null;

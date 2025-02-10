@@ -1,32 +1,33 @@
-import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from "react";
 import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
-interface OrderItem {
-  id: number;
-  product_id: number;
-  quantity: number;
-  price: number;
-  productDetails?: {
-    name: string;
-    price: number;
-  };
-}
-
 export interface Order {
-  id: number;
+  id: string;
   user_id: string;
+  items: { product_id: string; quantity: number; price: number }[];
   total: number;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  status: "pending" | "processing" | "completed" | "cancelled";
   shipping_address: string;
   created_at: string;
-  items: OrderItem[];
+  updated_at: string; // Added updated_at field
 }
 
 interface OrdersContextType {
   orders: Order[];
   fetchOrders: () => Promise<void>;
-  updateOrderStatus: (orderId: number, status: Order['status']) => Promise<void>;
+  updateOrderStatus: (
+    orderId: string,
+    status: Order["status"]
+  ) => Promise<void>;
+  deleteOrder: (orderId: string) => Promise<void>; // Added deleteOrder method
 }
 
 const OrdersContext = createContext<OrdersContextType | null>(null);
@@ -41,80 +42,69 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Get all orders for the current user
       const { data: ordersData, error: ordersError } = await db
-        .from('orders')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (ordersError) throw ordersError;
 
-      // Then get order items and products for each order
-      const ordersWithItems = await Promise.all(
-        (ordersData || []).map(async (order) => {
-          // First get order items
-          const { data: itemsData, error: itemsError } = await db
-            .from('order_items')
-            .select('*')
-            .eq('order_id', order.id);
-
-          if (itemsError) throw itemsError;
-
-          // Then get product details for each item
-          const itemsWithProducts = await Promise.all(
-            (itemsData || []).map(async (item) => {
-              const { data: productData, error: productError } = await db
-                .from('products')
-                .select('name, price')
-                .eq('id', item.product_id)
-                .single();
-
-              if (productError) throw productError;
-
-              return {
-                ...item,
-                productDetails: productData
-              };
-            })
-          );
-
-          return {
-            ...order,
-            items: itemsWithProducts
-          };
-        })
-      );
-
-      setOrders(ordersWithItems);
+      // Set orders directly as we no longer need to fetch items separately
+      setOrders(ordersData || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error("Error fetching orders:", error);
       throw error;
     }
   }, [user]);
 
-  const updateOrderStatus = useCallback(async (orderId: number, status: Order['status']) => {
-    if (!user) return;
-    
-    try {
-      const { error } = await db
-        .from('orders')
-        .update({ status })
-        .eq('id', orderId)
-        .eq('user_id', user.id);
+  const updateOrderStatus = useCallback(
+    async (orderId: string, status: Order["status"]) => {
+      if (!user) return;
 
-      if (error) throw error;
-      await fetchOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      throw error;
-    }
-  }, [user, fetchOrders]);
+      try {
+        const { error } = await db
+          .from("orders")
+          .update({ status })
+          .eq("id", orderId)
+          .eq("user_id", user.id);
+
+        if (error) throw error;
+        await fetchOrders();
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        throw error;
+      }
+    },
+    [user, fetchOrders]
+  );
+
+  const deleteOrder = useCallback(
+    async (orderId: string) => {
+      if (!user) return;
+
+      try {
+        const { error } = await db
+          .from("orders")
+          .delete()
+          .eq("id", orderId)
+          .eq("user_id", user.id);
+
+        if (error) throw error;
+        await fetchOrders();
+      } catch (error) {
+        console.error("Error deleting order:", error);
+        throw error;
+      }
+    },
+    [user, fetchOrders]
+  );
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
   return (
-    <OrdersContext.Provider value={{ orders, fetchOrders, updateOrderStatus }}>
+    <OrdersContext.Provider value={{ orders, fetchOrders, updateOrderStatus, deleteOrder }}>
       {children}
     </OrdersContext.Provider>
   );

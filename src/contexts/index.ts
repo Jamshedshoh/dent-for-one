@@ -8,3 +8,4 @@ export { DiscountsProvider, useDiscounts } from "./DiscountsContext";
 export { SuppliersProvider, useSuppliers } from "./SuppliersContext";
 export { PreOrdersProvider, usePreOrders } from "./PreOrdersContext";
 export { BlogProvider, useBlog } from "./BlogContext";
+export { ShopProvider, useShop } from "./ShopContext";

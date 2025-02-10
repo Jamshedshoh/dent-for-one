@@ -3,6 +3,7 @@ import { useProducts } from "../../../contexts";
 import { CollapseCard } from "../../ui/CollapseCard";
 import { Modal } from "../../ui/Modal";
 import { Edit, Trash } from "lucide-react";
+import { Search } from "../../ui/Search";
 
 export const Products = () => {
   const {
@@ -15,6 +16,7 @@ export const Products = () => {
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [editProductId, setEditProductId] = useState<number | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleFetchProducts = useCallback(() => {
     fetchProducts();
@@ -99,6 +101,7 @@ export const Products = () => {
   const productActions = (productId: number) => {
     return [
       <button
+        key="edit"
         className="text-blue-500 hover:text-blue-600"
         aria-label="Edit"
         title="Edit"
@@ -107,7 +110,8 @@ export const Products = () => {
         <Edit />
       </button>,
       <button
-        className="text-red-500 hover:text-red-600"
+        key="delete"
+      className="text-red-500 hover:text-red-600"
         aria-label="Delete"
         title="Delete"
         onClick={() => {
@@ -132,6 +136,8 @@ export const Products = () => {
           Add New Product
         </button>
       </div>
+
+      <Search query={searchQuery} onSearch={setSearchQuery} />
 
       <div className="space-y-4">
         {products.map((product) => (
@@ -260,12 +266,21 @@ export const Products = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-          <button
-            type="submit"
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            Add
-          </button>
+          <div className="mt-4 flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={() => setIsAddFormOpen(false)} // Assuming this closes the form
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Add
+            </button>
+          </div>
         </form>
       </Modal>
 
@@ -368,12 +383,23 @@ export const Products = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-          <button
-            type="submit"
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            Save
-          </button>
+          <div className="mt-4 flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEditProductId(null); // Assuming this resets the form or closes the modal
+              }}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </div>
         </form>
       </Modal>
 

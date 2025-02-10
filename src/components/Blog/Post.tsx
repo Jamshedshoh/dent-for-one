@@ -15,7 +15,7 @@ export const Post = () => {
     const loadPost = async () => {
       try {
         if (id) {
-          const postData = await fetchPost(parseInt(id));
+          const postData = await fetchPost(id);
           setPost(postData);
         }
         setLoading(false);

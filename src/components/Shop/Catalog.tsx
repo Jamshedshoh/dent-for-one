@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useShop } from "../../contexts/ShopContext";
-import { Layout } from "../Layout";
+import { Layout } from "./Layout";
 
 export const Catalog = () => {
-  const { products, categories, filters, setFilters, applyFilters, addToCart } = useShop();
+  const { category, subcategory } = useParams();
+  const { products, categories, filters, setFilters, applyFilters, addToCart } =
+    useShop();
   const [sortBy, setSortBy] = useState("featured");
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,30 +49,9 @@ export const Catalog = () => {
       <div className="container mx-auto px-4 pt-20">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Filters Sidebar */}
-          <div className="w-full md:w-1/4">
+          {/* <div className="w-full md:w-1/4">
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-4">Filters</h3>
-              
-              {/* Categories */}
-              <div className="mb-6">
-                <h4 className="font-medium mb-2">Categories</h4>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <label key={category} className="flex items-center">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={filters.category === category}
-                        onChange={() => handleCategoryChange(category)}
-                        className="mr-2"
-                      />
-                      {category}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Range */}
               <div>
                 <h4 className="font-medium mb-2">Price Range</h4>
                 <div className="space-y-2">
@@ -79,7 +60,12 @@ export const Catalog = () => {
                     min="0"
                     max="1000"
                     value={filters.priceRange[1]}
-                    onChange={(e) => handlePriceRangeChange(filters.priceRange[0], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handlePriceRangeChange(
+                        filters.priceRange[0],
+                        parseInt(e.target.value)
+                      )
+                    }
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-gray-600">
@@ -89,14 +75,16 @@ export const Catalog = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Main Content */}
-          <div className="w-full md:w-3/4">
+          <div className="w-full">
             {/* Sorting Bar */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{filteredProducts.length} Products</span>
+                <span className="text-gray-600">
+                  {filteredProducts.length} Products
+                </span>
                 <select
                   value={sortBy}
                   onChange={handleSortChange}
@@ -112,12 +100,18 @@ export const Catalog = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
+                <div
+                  key={product.id}
+                  className="bg-white rounded-lg shadow overflow-hidden"
+                >
                   <Link to={`/shop/products/${product.id}`}>
                     <img
-                      src={product.image_url || `https://picsum.photos/300/200?random=${product.id}`}
+                      src={
+                        product.image_url ||
+                        `https://picsum.photos/300/200?random=${product.id}`
+                      }
                       alt={product.name}
                       className="w-full h-48 object-cover hover:opacity-90 transition-opacity"
                     />
@@ -128,12 +122,14 @@ export const Catalog = () => {
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="text-sm text-gray-500 mt-1">{product.category}</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {product.category}
+                    </p>
                     <div className="flex justify-between items-center mt-4">
                       <span className="text-blue-600 font-semibold">
                         ${product.price.toFixed(2)}
                       </span>
-                      <button 
+                      <button
                         onClick={() => handleAddToCart(product)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       >
@@ -145,7 +141,9 @@ export const Catalog = () => {
               ))}
               {filteredProducts.length === 0 && (
                 <div className="col-span-full text-center py-8">
-                  <p className="text-gray-500">No products found matching your criteria.</p>
+                  <p className="text-gray-500">
+                    No products found matching your criteria.
+                  </p>
                 </div>
               )}
             </div>

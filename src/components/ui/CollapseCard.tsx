@@ -3,9 +3,9 @@ import { useState } from "react";
 import { ImageSkeleton } from "./ImageSkeleton";
 
 interface CollapseCardProps {
-  title: string;
+  title: string | React.ReactNode;
   children: React.ReactNode;
-  actions: React.ReactNode[];
+  actions?: React.ReactNode[];
   imageUrl?: string;
   imageSkeleton?: boolean;
 }
@@ -50,7 +50,7 @@ export const CollapseCard = ({
           </button>
         </div>
         <div className="flex items-center space-x-2">
-          {actions}
+          {actions || ''}
           <button className="flex-1" onClick={toggleExpand} aria-label="Expand/Collapse" title="Expand/Collapse">
             <span className="text-gray-500">
               {isExpanded ? <ChevronUp /> : <ChevronDown />}

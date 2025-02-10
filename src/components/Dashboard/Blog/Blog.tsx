@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBlog } from "../../../contexts";
 import { Plus } from "lucide-react";
-import { Search } from "./Search";
+import { Search } from "../../ui/Search";
 import { PostItem } from "./PostItem";
 import { PostFormAdd } from "./PostFormAdd";
 import { PostFormEdit } from "./PostFormEdit";

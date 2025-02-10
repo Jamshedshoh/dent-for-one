@@ -2,8 +2,8 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import { db } from "../../database/client";
 
 interface Inventory {
-  id: number;
-  product_id: number;
+  id: string;
+  product_id: string;
   quantity: number;
   created_at: string;
   updated_at: string;
@@ -11,8 +11,10 @@ interface Inventory {
 
 interface InventoryContextType {
   inventory: Inventory[];
-  updateStock: (productId: number, quantity: number) => Promise<void>;
+  addStock: (data: Partial<Inventory>) => Promise<void>;
+  updateStock: (inventoryId: string, data: Partial<Inventory>) => Promise<void>;
   getStockLevels: () => Promise<void>;
+  deleteStock: (inventoryId: string) => Promise<void>;
 }
 
 const InventoryContext = createContext<InventoryContextType | null>(null);
@@ -20,15 +22,26 @@ const InventoryContext = createContext<InventoryContextType | null>(null);
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
 
-  const updateStock = async (productId: number, quantity: number) => {
-    const { data, error } = await db
+  const addStock = async (inventoryData: Partial<Inventory>) => {
+    const { data: _, error } = await db
       .from("inventory")
-      .upsert({ product_id: productId, quantity })
+      .insert(inventoryData)
       .single();
     if (error) throw error;
-    setInventory((prev) =>
-      prev.map((i) => (i.product_id === productId ? { ...i, ...data } : i))
-    );
+  };
+
+  const updateStock = async (inventoryId: string, inventoryData: Partial<Inventory>) => {
+    const { data: _, error } = await db
+      .from("inventory")
+      .update(inventoryData)
+      .eq("id", inventoryId)
+      .single();
+    if (error) throw error;
+  };
+
+  const deleteStock = async (inventoryId: string) => {
+    const { data: _, error } = await db.from("inventory").delete().eq("id", inventoryId);
+    if (error) throw error;
   };
 
   const getStockLevels = useCallback(async () => {
@@ -42,7 +55,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   }, [getStockLevels]);
 
   return (
-    <InventoryContext.Provider value={{ inventory, updateStock, getStockLevels }}>
+    <InventoryContext.Provider value={{ inventory, addStock, updateStock, getStockLevels, deleteStock }}>
       {children}
     </InventoryContext.Provider>
   );

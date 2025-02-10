@@ -3,7 +3,7 @@ import { db } from "../../database/client";
 import { useAuth } from "./AuthContext";
 
 export interface BlogPost {
-  id: number;
+  id: string;
   title: string;
   content: string;
   status: string; // draft, published, archived
@@ -14,11 +14,11 @@ export interface BlogPost {
 interface BlogContextType {
   posts: BlogPost[];
   fetchPosts: () => Promise<void>;
-  fetchPost: (id: number) => Promise<BlogPost | null>;
+  fetchPost: (id: string) => Promise<BlogPost | null>;
   createPost: (post: Partial<BlogPost>) => Promise<void>;
-  updatePost: (id: number, post: Partial<BlogPost>) => Promise<void>;
-  deletePost: (id: number) => Promise<void>;
-  publishPost: (id: number) => Promise<void>;
+  updatePost: (id: string, post: Partial<BlogPost>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
+  publishPost: (id: string) => Promise<void>;
 }
 
 const BlogContext = createContext<BlogContextType | null>(null);
@@ -33,13 +33,13 @@ export const BlogProvider = ({ children }: { children: ReactNode }) => {
     setPosts(data || []);
   }, []);
 
-  const fetchPost = useCallback(async (id: number) => {
+  const fetchPost = useCallback(async (id: string) => {
     const { data, error } = await db.from("blog_posts").select("*").eq("id", id).single();
     if (error) throw error;
     return data;
   }, []);
 
-  const createPost = async (post: Omit<BlogPost, "id" | "author_id">) => {
+  const createPost = async (post: Partial<BlogPost>) => {
     if (!user) throw new Error("User not authenticated");
     
     const postData = {
@@ -53,7 +53,7 @@ export const BlogProvider = ({ children }: { children: ReactNode }) => {
     setPosts((prev) => [...prev, data as BlogPost]);
   };
 
-  const updatePost = async (id: number, post: Partial<BlogPost>) => {
+  const updatePost = async (id: string, post: Partial<BlogPost>) => {
     if (!user) throw new Error("User not authenticated");
 
     const { data, error } = await db
@@ -66,18 +66,18 @@ export const BlogProvider = ({ children }: { children: ReactNode }) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...(data as BlogPost) } : p)));
   };
 
-  const deletePost = async (id: number) => {
+  const deletePost = async (id: string) => {
     const { error } = await db.from("blog_posts").delete().eq("id", id);
     if (error) throw error;
     setPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const publishPost = async (id: number) => {
+  const publishPost = async (id: string) => {
     const { data, error } = await db
       .from("blog_posts")
       .update({ published_at: new Date().toISOString() })
       .eq("id", id)
-      .eq("author_id", user.id)
+      .eq("author_id", user?.id)
       .single();
     if (error) throw error;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...(data as BlogPost) } : p)));

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, Search, User, Menu, X, ChevronDown, LogOut, Settings } from "lucide-react";
+import { ShoppingCart, Search, Menu, X, ChevronDown, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../contexts";

@@ -9,14 +9,9 @@ import { Contact } from "./components/Contact";
 import { Blog, Post } from "./components/Blog";
 import { Blog as BlogDashboard } from "./components/Dashboard/Blog";
 import {
-  Appointments,
-  Billing,
   Dashboard,
-  DatabaseManagement,
   Inbox,
   Overview,
-  PatientManagement,
-  Marketing,
   Reports,
   Settings,
   Products,
@@ -60,6 +55,8 @@ createRoot(document.getElementById("root")!).render(
             <Route path="shop">
               <Route index element={<Shop />} />
               <Route path="catalog" element={<Catalog />} />
+              <Route path="catalog/:category" element={<Catalog />} />
+              <Route path="catalog/:category/:subcategory" element={<Catalog />} />
               <Route path="products/:id" element={<ProductDetails />} />
               <Route path="cart" element={<Cart />} /> 
               <Route path="checkout" element={
@@ -145,7 +142,9 @@ createRoot(document.getElementById("root")!).render(
                 path="shop/inventory"
                 element={
                   <InventoryProvider>
-                    <Inventory />
+                    <ProductsProvider>
+                      <Inventory />
+                    </ProductsProvider>
                   </InventoryProvider>
                 }
               />
