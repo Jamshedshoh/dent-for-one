@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { ShoppingCart, Search, Menu, X, ChevronDown, LogOut, Settings } from "lucide-react";
+import {
+  ShoppingCart,
+  Search,
+  Menu,
+  X,
+  ChevronDown,
+  LogOut,
+  Settings,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../contexts";
-import { useShop } from '../contexts/ShopContext';
+import { useShop } from "../contexts/ShopContext";
 
 // Navbar Component
 export const Navbar = () => {
@@ -26,7 +34,10 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-blue-600 flex-shrink-0">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-blue-600 flex-shrink-0"
+          >
             Dent
           </Link>
 
@@ -44,18 +55,30 @@ export const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/shop" className="text-gray-700 hover:text-blue-600 font-medium">
+            <Link
+              to="/shop"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
               Shop
             </Link>
-            <Link to="/community" className="text-gray-700 hover:text-blue-600 font-medium">
+            <Link
+              to="/community"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
               Community
             </Link>
-            <Link to="/blog" className="text-gray-700 hover:text-blue-600 font-medium">
+            <Link
+              to="/blog"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
               Blog
             </Link>
-            
+
             {/* Cart Icon */}
-            <Link to="/shop/cart" className="text-gray-700 hover:text-blue-600 relative">
+            <Link
+              to="/shop/cart"
+              className="text-gray-700 hover:text-blue-600 relative"
+            >
               <ShoppingCart className="w-6 h-6" />
               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {getCartCount()}
@@ -70,7 +93,11 @@ export const Navbar = () => {
                   className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
                 >
                   <span className="font-medium">{user.email}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      isUserMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -113,9 +140,25 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden text-gray-700" onClick={toggleMenu}>
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Cart Icon for Mobile */}
+            <Link
+              to="/shop/cart"
+              className="text-gray-700 hover:text-blue-600 relative ml-4"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {getCartCount()}
+              </span>
+            </Link>
+            <button className="text-gray-700" onClick={toggleMenu}>
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Search - Visible only on mobile */}
@@ -140,20 +183,31 @@ export const Navbar = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-4 space-y-4">
-          <Link to="/shop" className="block text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/shop"
+            className="block text-gray-700 hover:text-blue-600 font-medium"
+          >
             Shop
           </Link>
-          <Link to="/community" className="block text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/community"
+            className="block text-gray-700 hover:text-blue-600 font-medium"
+          >
             Community
           </Link>
-          <Link to="/blog" className="block text-gray-700 hover:text-blue-600 font-medium">
+          <Link
+            to="/blog"
+            className="block text-gray-700 hover:text-blue-600 font-medium"
+          >
             Blog
           </Link>
-          
+
           <div className="pt-4 border-t border-gray-200">
             {user ? (
               <div className="space-y-4">
-                <span className="block text-gray-700 font-medium">{user.email}</span>
+                <span className="block text-gray-700 font-medium">
+                  {user.email}
+                </span>
                 <button
                   className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700"
                   onClick={logout}
