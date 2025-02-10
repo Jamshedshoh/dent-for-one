@@ -18,12 +18,8 @@ export const Categories = () => {
     setOpenCategory(openCategory === categoryName ? undefined : categoryName);
   };
 
-  const toggleShowAllCategories = () => {
-    setShowAllCategories(!showAllCategories);
-  };
-
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto fixed top-16 left-0 right-0 z-10">
       <nav className="bg-white w-full px-2 pt-2">
         <ul className="flex">
 
@@ -31,7 +27,6 @@ export const Categories = () => {
             .slice(0, showAllCategories ? categories.length : 6)
             .map((category) => (
               <li key={category.slug} className="relative group">
-
                 <button
                   className="py-2 px-4 text-gray-700 hover:text-blue-600 text-lg flex items-center justify-between"
                   onClick={() => toggleDropdown(category.name)}

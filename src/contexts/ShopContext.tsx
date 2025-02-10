@@ -6,7 +6,6 @@ import {
   ReactNode,
 } from "react";
 import { db } from "../../database/client";
-import { categories as defaultCategories } from "./data/categories";
 
 export type Product = {
   id: string;
@@ -66,7 +65,7 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<{
     category: string;
     priceRange: [number, number];
@@ -78,7 +77,9 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
+
 
   const fetchProducts = async () => {
     const { data, error } = await db.from("products").select("*");
@@ -97,7 +98,15 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
         )
         .slice(0, 10)
     );
-    // setCategories([...new Set(data.map((p) => p.category))]);
+  };
+
+  const fetchCategories = async () => {
+    const { data, error } = await db.from("categories").select("*").order('position');
+    if (error) {
+      console.error("Error fetching categories:", error);
+      return;
+    }
+    setCategories(data);
   };
 
   const applyFilters = (filteredProducts: Product[]): Product[] => {
