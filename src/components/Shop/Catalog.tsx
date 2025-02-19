@@ -1,24 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useShop } from "../../contexts/ShopContext";
 import { Layout } from "./Layout";
 
 export const Catalog = () => {
-  const { category, subcategory } = useParams();
+  const { category: paramCategory, subcategory: paramSubcategory } =
+    useParams();
   const { products, categories, filters, setFilters, applyFilters, addToCart } =
     useShop();
   const [sortBy, setSortBy] = useState("featured");
+  const [filteredProducts, setFilteredProducts] = useState(products || []);
+
+  useEffect(() => {
+    const newFilters = { ...filters };
+    if (paramCategory) {
+      newFilters.category = paramCategory;
+    }
+    if (paramSubcategory) {
+      newFilters.subcategory = paramSubcategory;
+    }
+    setFilters(newFilters);
+  }, [paramCategory, paramSubcategory, setFilters]);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
-  };
-
-  const handleCategoryChange = (category: string) => {
-    setFilters({ ...filters, category });
-  };
-
-  const handlePriceRangeChange = (min: number, max: number) => {
-    setFilters({ ...filters, priceRange: [min, max] });
   };
 
   const getSortedProducts = () => {
@@ -42,44 +47,16 @@ export const Catalog = () => {
     // Optional: Add a toast notification here
   };
 
-  const filteredProducts = applyFilters(getSortedProducts());
+  useEffect(() => {
+    const sortedProducts = getSortedProducts();
+    setFilteredProducts(applyFilters(sortedProducts));
+  }, [filters, products]);
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 pt-20">
+      <div className="container mx-auto px-4 pt-20 min-h-screen">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Filters Sidebar */}
-          {/* <div className="w-full md:w-1/4">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Filters</h3>
-              <div>
-                <h4 className="font-medium mb-2">Price Range</h4>
-                <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1000"
-                    value={filters.priceRange[1]}
-                    onChange={(e) =>
-                      handlePriceRangeChange(
-                        filters.priceRange[0],
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>${filters.priceRange[0]}</span>
-                    <span>${filters.priceRange[1]}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
-          {/* Main Content */}
           <div className="w-full">
-            {/* Sorting Bar */}
             <div className="bg-white p-4 rounded-lg shadow mb-6">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">
@@ -109,7 +86,7 @@ export const Catalog = () => {
                   <Link to={`/shop/products/${product.id}`}>
                     <img
                       src={
-                        product.image_url ||
+                        product.image ||
                         `https://picsum.photos/300/200?random=${product.id}`
                       }
                       alt={product.name}

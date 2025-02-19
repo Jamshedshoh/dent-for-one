@@ -18,7 +18,7 @@ export const NewArrivals = ({ limit }: NewArrivalsProps) => {
             New Arrivals
           </h2>
           <Link
-            to="/shop/catalog?category=new"
+            to="/shop/catalog/new"
             className="flex items-center text-blue-600 hover:text-blue-700 font-medium"
           >
             View All New Arrivals

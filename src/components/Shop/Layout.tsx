@@ -2,7 +2,6 @@ import { Footer } from "../Footer";
 import { Navbar } from "../Navbar";
 import { Categories } from "./Categories";
 
-
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -12,8 +11,8 @@ export const Layout = ({ children }: LayoutProps) => {
     <div className="min-h-screen pt-16">
       <Navbar />
       <Categories />
-      {children}
+      <main className="min-h-screen">{children}</main>
       <Footer />
     </div>
   );
-}; 
+};

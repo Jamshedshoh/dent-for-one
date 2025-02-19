@@ -22,6 +22,12 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface Subcategory {
+  name: string;
+  displayName: string;
+  slug: string;
+}
+
 interface Category {
   name: string;
   displayName: string;
@@ -30,11 +36,7 @@ interface Category {
     name: string;
     displayName: string;
     slug: string;
-    subcategories: {
-      name: string;
-      displayName: string;
-      slug: string;
-    }[];
+    subcategories: Subcategory[];
   }[];
 }
 
@@ -42,9 +44,14 @@ interface ShopContextType {
   products: Product[];
   featuredProducts: Product[];
   newArrivals: Product[];
-  categories: string[];
+  categories: Category[];
 
-  filters: { category: string; priceRange: [number, number] };
+  filters: {
+    category: string;
+    priceRange: [number, number];
+    subcategory: string;
+  };
+  fetchProductById: (productId: string) => any;
   setFilters: (filters: {
     category: string;
     priceRange: [number, number];
@@ -52,8 +59,8 @@ interface ShopContextType {
   applyFilters: (filteredProducts: Product[]) => Product[];
   cartItems: CartItem[];
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: string) => void; // Changed to string
+  updateQuantity: (productId: string, quantity: number) => void; // Changed to string
   clearCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
@@ -67,19 +74,13 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<{
-    category: string;
+    category: string; // This will now hold a list of slugs
     priceRange: [number, number];
   }>({
-    category: "",
+    category: "", // This can be a comma-separated string of slugs
     priceRange: [0, 1000],
   });
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
 
   const fetchProducts = async () => {
     const { data, error } = await db.from("products").select("*");
@@ -101,7 +102,10 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchCategories = async () => {
-    const { data, error } = await db.from("categories").select("*").order('position');
+    const { data, error } = await db
+      .from("categories")
+      .select("*")
+      .order("position");
     if (error) {
       console.error("Error fetching categories:", error);
       return;
@@ -110,12 +114,23 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const applyFilters = (filteredProducts: Product[]): Product[] => {
-    return filteredProducts.filter(
-      (product) =>
-        (filters.category ? product.category === filters.category : true) &&
-        product.price >= filters.priceRange[0] &&
-        product.price <= filters.priceRange[1]
-    );
+    const condition1 = (product: any) =>
+      filters.category
+        ? product.category
+            .split(",")
+            .map((i: string) => i.trim())
+            .includes(filters.category)
+        : true;
+
+    const condition2 = (product: any) =>
+      filters.subcategory
+        ? product.category
+            .split(",")
+            .map((i: string) => i.trim())
+            .includes(filters.subcategory)
+        : true;
+
+    return filteredProducts.filter(condition1).filter(condition2);
   };
 
   const addToCart = (product: Product) => {
@@ -132,13 +147,15 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
+    // Changed to string
     setCartItems((prevItems) =>
       prevItems.filter((item) => item.id !== productId)
     );
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
+    // Changed to string
     if (quantity < 1) {
       removeFromCart(productId);
       return;
@@ -165,10 +182,35 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
   };
 
+  const fetchProductById = async (id: string) => {
+    try {
+      const { data, error } = await db
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching product:", error);
+        return null;
+      }
+      return data;
+    } catch (error) {
+      console.error("Could not fetch product from ", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
   return (
     <ShopContext.Provider
       value={{
         products,
+        fetchProductById,
         featuredProducts,
         newArrivals,
         categories,
