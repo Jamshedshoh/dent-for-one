@@ -206,7 +206,7 @@ export const ProductDetails = () => {
                 </div>
                 <div className="border rounded p-4">
                   <p className="italic text-gray-700">
-                    "Great quality and fast delivery. Very satisfied."
+                    "The product exceeded my expectations. Will definitely buy again!"
                   </p>
                   <p className="text-sm text-gray-500">- Jane Smith</p>
                 </div>
