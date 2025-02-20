@@ -282,6 +282,8 @@ export const ProductAlsoPurchased = ({ product }: any) => {
 };
 
 export const ProductInfo = ({ product }: any) => {
+  const { addToCart } = useShop();
+
   const mockColors = ["Red", "Blue", "Green"];
   const mockSizes = ["S", "M", "L", "XL"];
 
@@ -297,10 +299,7 @@ export const ProductInfo = ({ product }: any) => {
   };
 
   const handleAddToCart = () => {
-    // Add to cart logic here
-    console.log(
-      `Added ${quantity} of ${product.name} (Color: ${selectedColor}, Size: ${selectedSize}) to cart.`
-    );
+    addToCart(product);
   };
 
   return (
@@ -421,7 +420,7 @@ export const ProductDetails = () => {
   const { id: productId } = useParams();
   const [product, setProduct] = useState<any>();
 
-  const { products, fetchProductById } = useShop();
+  const { fetchProductById } = useShop();
 
   const getProduct = async () => {
     if (productId) {
@@ -433,7 +432,7 @@ export const ProductDetails = () => {
 
   useEffect(() => {
     getProduct();
-  }, []);
+  }, [productId]);
 
   return (
     <Layout>
