@@ -129,36 +129,36 @@ export const ProductReviewsCount = ({ product }: any) => {
         <Check />
       </span>
       <span className="text-gray-700">
-        {product?.reviews_count || 0} Reviews
+        {product?.reviews_count || 45} Reviews
       </span>
     </div>
   );
 };
 
-export const ProductInfluencer = ({ product }: any) => {
-  const mockInfluencer = {
-    name: "The Influencer",
-    profile_url: "https://example.com/mock-influencer",
+export const ProductSeller = ({ product }: any) => {
+  const mockSeller = {
+    name: "The Seller",
+    profile_url: "https://instagram.com/jk.feelenergy",
   };
 
-  const influencer = product?.influencer || mockInfluencer;
+  const seller = product?.seller || mockSeller;
 
   return (
     <div className="flex mb-4">
       <span className="text-gray-700 mr-1">
         <PersonStanding />
       </span>
-      {influencer.profile_url ? (
+      {seller.profile_url ? (
         <a
-          href={influencer.profile_url}
+          href={seller.profile_url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:text-blue-700"
         >
-          {influencer.name}
+          {seller.name}
         </a>
       ) : (
-        <span className="text-gray-700">{influencer.name}</span>
+        <span className="text-gray-700">{seller.name}</span>
       )}
     </div>
   );
@@ -309,7 +309,7 @@ export const ProductInfo = ({ product }: any) => {
       <div className="flex space-x-2">
         <ProductRating product={product} />
         <ProductReviewsCount product={product} />
-        <ProductInfluencer product={product} />
+        <ProductSeller product={product} />
       </div>
 
       <div className="flex space-x-4 mb-4 items-baseline">
