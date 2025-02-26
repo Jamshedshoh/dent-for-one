@@ -53,7 +53,8 @@ interface ShopContextType {
   };
   fetchProductById: (productId: string) => any;
   setFilters: (filters: {
-    category: string;
+    category: string | undefined;
+    subcategory: string | undefined;
     priceRange: [number, number];
   }) => void;
   applyFilters: (filteredProducts: Product[]) => Product[];
@@ -74,7 +75,8 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<{
-    category: string; // This will now hold a list of slugs
+    category: string | undefined; // This will now hold a list of slugs
+    subcategory: string | undefined;
     priceRange: [number, number];
   }>({
     category: "", // This can be a comma-separated string of slugs

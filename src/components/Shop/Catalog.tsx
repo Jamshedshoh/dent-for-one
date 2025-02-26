@@ -6,19 +6,20 @@ import { Layout } from "./Layout";
 export const Catalog = () => {
   const { category: paramCategory, subcategory: paramSubcategory } =
     useParams();
+
   const { products, categories, filters, setFilters, applyFilters, addToCart } =
     useShop();
   const [sortBy, setSortBy] = useState("featured");
   const [filteredProducts, setFilteredProducts] = useState(products || []);
 
   useEffect(() => {
-    const newFilters = { ...filters };
-    if (paramCategory) {
-      newFilters.category = paramCategory;
-    }
-    if (paramSubcategory) {
-      newFilters.subcategory = paramSubcategory;
-    }
+    console.log({
+      paramCategory,
+      paramSubcategory,
+    });
+    const newFilters: any = { ...filters };
+    newFilters.category = paramCategory;
+    newFilters.subcategory = paramSubcategory;
     setFilters(newFilters);
   }, [paramCategory, paramSubcategory, setFilters]);
 
