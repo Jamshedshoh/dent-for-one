@@ -2,14 +2,20 @@ import { Link } from "react-router-dom";
 import { useShop } from "../../contexts/ShopContext";
 
 interface ProductCardProps {
-  product: any; // Define product type more specifically if available
+  product: any;
+  badge?: string | undefined;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, badge }) => {
   const { addToCart } = useShop();
 
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
+      {badge && (
+        <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
+          {badge}
+        </span>
+      )}
       <Link to={`/shop/products/${product.id}`}>
         <img
           src={
@@ -20,14 +26,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           className="w-full h-48 object-cover hover:opacity-90 transition-opacity"
         />
       </Link>
-      <div className="p-4">
+      <div className="p-4 flex flex-col space-y-2">
         <Link to={`/shop/products/${product.id}`}>
           <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600">
             {product.name}
           </h3>
         </Link>
-        <p className="text-gray-600 mt-2">{product.category}</p>
-        <div className="flex justify-between items-center mt-4">
+        <p className="text-gray-600 mt-2">{product.description}</p>
+        <div className="flex justify-between items-center">
           <span className="text-blue-600 font-semibold">
             ${product.price.toFixed(2)}
           </span>
