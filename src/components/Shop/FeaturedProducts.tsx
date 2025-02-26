@@ -28,7 +28,7 @@ export const FeaturedProducts = ({ limit }: FeaturedProductsProps) => {
         </div>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {displayProducts.map((product) => (
-            <ProductCard product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
           {displayProducts.length === 0 && (
             <p className="text-gray-500 text-center col-span-full">

@@ -13,7 +13,6 @@ export type Product = {
   price: number;
   stock: number;
   category: string;
-  is_featured: boolean;
   created_at: string;
   image: string;
 };
@@ -44,16 +43,18 @@ interface ShopContextType {
   products: Product[];
   featuredProducts: Product[];
   newArrivals: Product[];
+  saleClearance: Product[];
   categories: Category[];
 
   filters: {
-    category: string;
+    category: string | undefined;
     priceRange: [number, number];
-    subcategory: string;
+    subcategory: string | undefined;
   };
   fetchProductById: (productId: string) => any;
   setFilters: (filters: {
-    category: string;
+    category: string | undefined;
+    subcategory: string | undefined;
     priceRange: [number, number];
   }) => void;
   applyFilters: (filteredProducts: Product[]) => Product[];
@@ -72,12 +73,15 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [saleClearance, setSaleClearance] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<{
-    category: string; // This will now hold a list of slugs
+    category: string | undefined; // This will now hold a list of slugs
+    subcategory: string | undefined;
     priceRange: [number, number];
   }>({
     category: "", // This can be a comma-separated string of slugs
+    subcategory: "",
     priceRange: [0, 1000],
   });
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -90,15 +94,9 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setProducts(data);
-    setFeaturedProducts(data.filter((p) => p.is_featured));
-    setNewArrivals(
-      [...data]
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        .slice(0, 10)
-    );
+    setFeaturedProducts(data.filter((p) => p.category.includes("featured")));
+    setNewArrivals(data.filter((p) => p.category.includes("new")));
+    setSaleClearance(data.filter((p) => p.category.includes("sale")));
   };
 
   const fetchCategories = async () => {
@@ -213,6 +211,7 @@ export const ShopProvider = ({ children }: { children: ReactNode }) => {
         fetchProductById,
         featuredProducts,
         newArrivals,
+        saleClearance,
         categories,
         filters,
         setFilters,

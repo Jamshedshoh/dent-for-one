@@ -9,7 +9,6 @@ export interface Product {
   stock: number;
   category: string;
   image_url?: string;
-  is_featured: boolean;
   created_at: string;
 }
 

@@ -36,10 +36,9 @@ export const Products = () => {
       category: string;
     }) => {
       try {
-        await createProduct({
-          ...productData,
-          is_featured: false,
-        });
+        await createProduct(
+          productData
+        );
         setIsAddFormOpen(false);
       } catch (error) {
         console.error("Error adding product:", error);
@@ -167,9 +166,6 @@ export const Products = () => {
               </div>
               <div>
                 <strong>Category:</strong> {product.category}
-              </div>
-              <div>
-                <strong>Featured:</strong> {product.is_featured ? "Yes" : "No"}
               </div>
             </div>
           </CollapseCard>
