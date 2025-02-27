@@ -24,7 +24,7 @@ export const Categories = () => {
         <ul className="flex">
 
           {categories
-            .slice(0, showAllCategories ? categories.length : 6)
+            // .slice(0, showAllCategories ? categories.length : 6)
             .map((category) => (
               <li key={category.slug} className="relative group">
                 <button

@@ -2,8 +2,12 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import { db } from "../../database/client";
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
+  displayName?: string;
+  slug?: string;
+  categories?: any[],
+  position?: number;
 }
 
 interface CategoriesContextType {
@@ -31,13 +35,13 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     setCategories((prev) => [...prev, data]);
   };
 
-  const updateCategory = async (id: number, name: string) => {
+  const updateCategory = async (id: string, name: string) => {
     const { data, error } = await db.from("categories").update({ name }).eq("id", id).single();
     if (error) throw error;
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...data } : c)));
   };
 
-  const deleteCategory = async (id: number) => {
+  const deleteCategory = async (id: string) => {
     const { error } = await db.from("categories").delete().eq("id", id);
     if (error) throw error;
     setCategories((prev) => prev.filter((c) => c.id !== id));
