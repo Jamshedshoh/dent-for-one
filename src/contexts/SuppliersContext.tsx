@@ -2,7 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import { db } from "../../database/client";
 
 interface Supplier {
-  id: number;
+  id: string;
   name: string;
   contact_email: string;
   phone: string;
@@ -13,8 +13,8 @@ interface SuppliersContextType {
   suppliers: Supplier[];
   fetchSuppliers: () => Promise<void>;
   addSupplier: (supplier: Omit<Supplier, "id">) => Promise<void>;
-  updateSupplier: (id: number, supplier: Partial<Supplier>) => Promise<void>;
-  deleteSupplier: (id: number) => Promise<void>;
+  updateSupplier: (id: string, supplier: Partial<Supplier>) => Promise<void>;
+  deleteSupplier: (id: string) => Promise<void>;
 }
 
 const SuppliersContext = createContext<SuppliersContextType | null>(null);
@@ -38,7 +38,7 @@ export const SuppliersProvider = ({ children }: { children: ReactNode }) => {
     setSuppliers((prev) => [...prev, data]);
   };
 
-  const updateSupplier = async (id: number, supplier: Partial<Supplier>) => {
+  const updateSupplier = async (id: string, supplier: Partial<Supplier>) => {
     const { data, error } = await db
       .from("suppliers")
       .update(supplier)
@@ -50,7 +50,7 @@ export const SuppliersProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const deleteSupplier = async (id: number) => {
+  const deleteSupplier = async (id: string) => {
     const { error } = await db.from("suppliers").delete().eq("id", id);
     if (error) throw error;
     setSuppliers((prev) => prev.filter((s) => s.id !== id));

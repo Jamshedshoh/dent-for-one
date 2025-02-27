@@ -1,9 +1,69 @@
+import { useEffect, useState } from "react";
+import { useBackgroundTask } from "../../../contexts/BackgroundTaskContext";
+
 export const Overview = () => {
+  const [counterSingle, setCounterSingle] = useState<number>(0);
+  const [counterRepeat, setCounterRepeat] = useState<number>(0);
+  const [counterLimited, setCounterLimited] = useState<number>(0);
+
+  const { addTask, removeTask } = useBackgroundTask();
+
+  useEffect(() => {
+    addTask(
+      "single",
+      () => {
+        setCounterSingle((prev) => prev + 1);
+      },
+      {
+        type: "timeout",
+        delay: 2000,
+      }
+    );
+    addTask(
+      "repeat",
+      () => {
+        setCounterRepeat((prev) => prev + 1);
+      },
+      {
+        type: "interval",
+        delay: 1000,
+      }
+    );
+    addTask(
+      "limited",
+      () => {
+        setCounterLimited((prev) => prev + 1);
+      },
+      {
+        type: "multiple",
+        delay: 1500,
+        runs: 3,
+      }
+    );
+
+    return () => removeTask("repeat");
+  }, []);
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-gray-800">
         Practice Overview
       </h2>
+
+      <div>
+        <label>Single</label>
+        <p>{counterSingle}</p>
+      </div>
+
+      <div>
+        <label>Repeat</label>
+        <p>{counterRepeat}</p>
+      </div>
+
+      <div>
+        <label>Limited</label>
+        <p>{counterLimited}</p>
+      </div>
 
       {/* Summary Overview */}
       <section className="bg-white p-6 rounded-lg shadow-md">

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import { db } from "../../database/client";
 
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   price: number;
@@ -15,8 +15,8 @@ export interface Product {
 interface ProductsContextType {
   products: Product[];
   fetchProducts: () => Promise<void>;
-  updateProduct: (id: number, data: Partial<Product>) => Promise<void>;
-  deleteProduct: (id: number) => Promise<void>;
+  updateProduct: (id: string, data: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   createProduct: (data: Omit<Product, 'id' | 'created_at'>) => Promise<void>;
 }
 
@@ -44,7 +44,7 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const updateProduct = useCallback(async (id: number, data: Partial<Product>) => {
+  const updateProduct = useCallback(async (id: string, data: Partial<Product>) => {
     try {
       const { error } = await db
         .from('products')
@@ -59,7 +59,7 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [fetchProducts]);
 
-  const deleteProduct = useCallback(async (id: number) => {
+  const deleteProduct = useCallback(async (id: string) => {
     try {
       const { error } = await db
         .from('products')

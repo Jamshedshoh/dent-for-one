@@ -14,8 +14,8 @@ export const Products = () => {
     deleteProduct,
   } = useProducts();
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-  const [editProductId, setEditProductId] = useState<number | null>(null);
-  const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [editProductId, setEditProductId] = useState<string | null>(null);
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleFetchProducts = useCallback(() => {
@@ -36,9 +36,7 @@ export const Products = () => {
       category: string;
     }) => {
       try {
-        await createProduct(
-          productData
-        );
+        await createProduct(productData);
         setIsAddFormOpen(false);
       } catch (error) {
         console.error("Error adding product:", error);
@@ -97,7 +95,7 @@ export const Products = () => {
     }
   };
 
-  const productActions = (productId: number) => {
+  const productActions = (productId: string) => {
     return [
       <button
         key="edit"
@@ -110,7 +108,7 @@ export const Products = () => {
       </button>,
       <button
         key="delete"
-      className="text-red-500 hover:text-red-600"
+        className="text-red-500 hover:text-red-600"
         aria-label="Delete"
         title="Delete"
         onClick={() => {

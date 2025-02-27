@@ -42,6 +42,7 @@ import { Categories } from "./components/Dashboard/Categories";
 import { Discounts } from "./components/Dashboard/Discounts";
 import { PreOrders } from "./components/Dashboard/PreOrders";
 import { Inventory } from "./components/Dashboard/Inventory";
+import { BackgroundTaskProvider } from "./contexts/BackgroundTaskContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -56,38 +57,60 @@ createRoot(document.getElementById("root")!).render(
               <Route index element={<Shop />} />
               <Route path="catalog" element={<Catalog />} />
               <Route path="catalog/:category" element={<Catalog />} />
-              <Route path="catalog/:category/:subcategory" element={<Catalog />} />
+              <Route
+                path="catalog/:category/:subcategory"
+                element={<Catalog />}
+              />
               <Route path="products/:id" element={<ProductDetails />} />
-              <Route path="cart" element={<Cart />} /> 
-              <Route path="checkout" element={
-                <OrderProvider>
-                  <Checkout />
-                </OrderProvider>
-                } />
+              <Route path="cart" element={<Cart />} />
+              <Route
+                path="checkout"
+                element={
+                  <OrderProvider>
+                    <Checkout />
+                  </OrderProvider>
+                }
+              />
             </Route>
             <Route path="community" element={<Community />} />
-            <Route path="blog" element={
-              <BlogProvider>
-                <Blog />
-              </BlogProvider>
-              } />
-            <Route path="blog/:id" element={
-              <BlogProvider>
-                <Post />
-              </BlogProvider>
-              } />
+            <Route
+              path="blog"
+              element={
+                <BlogProvider>
+                  <Blog />
+                </BlogProvider>
+              }
+            />
+            <Route
+              path="blog/:id"
+              element={
+                <BlogProvider>
+                  <Post />
+                </BlogProvider>
+              }
+            />
             <Route path="contact" element={<Contact />} />
             <Route path="patient" element={<Patient />} />
             <Route path="dentist" element={<Dentist />} />
             <Route path="business" element={<Business />} />
             <Route path="dashboard" element={<Dashboard />}>
-              <Route path="overview" element={<Overview />} />
+              <Route
+                path="overview"
+                element={
+                  <BackgroundTaskProvider>
+                    <Overview />
+                  </BackgroundTaskProvider>
+                }
+              />
               <Route path="inbox" element={<Inbox />} />
-              <Route path="blog" element={
-                <BlogProvider>
-                  <BlogDashboard />
-                </BlogProvider>
-                } />
+              <Route
+                path="blog"
+                element={
+                  <BlogProvider>
+                    <BlogDashboard />
+                  </BlogProvider>
+                }
+              />
               <Route
                 path="shop/products"
                 element={
@@ -158,7 +181,6 @@ createRoot(document.getElementById("root")!).render(
               />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
-              
             </Route>
           </Routes>
         </Router>
