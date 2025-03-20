@@ -4,7 +4,7 @@ import { Sidebar } from "../Sidebar";
 import { useNavigate, Outlet } from "react-router-dom"; // Import Link and Outlet from react-router-dom
 import { useAuth } from "../../contexts";
 
-export const Dashboard = () => {
+export const Account = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

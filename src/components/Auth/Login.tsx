@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../Navbar";
@@ -11,10 +11,12 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  if (user) {
-    navigate("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+      return;
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,10 @@ export const Login = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form className="w-80 p-4 bg-white shadow-md rounded" onSubmit={handleSubmit}>
+      <form
+        className="w-80 p-4 bg-white shadow-md rounded"
+        onSubmit={handleSubmit}
+      >
         <input
           type="email"
           placeholder="Email"
@@ -46,7 +51,10 @@ export const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white p-2 rounded"
+        >
           Login
         </button>
       </form>

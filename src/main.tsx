@@ -43,6 +43,7 @@ import { Discounts } from "./components/Dashboard/Discounts";
 import { PreOrders } from "./components/Dashboard/PreOrders";
 import { Inventory } from "./components/Dashboard/Inventory";
 import { BackgroundTaskProvider } from "./contexts/BackgroundTaskContext";
+import { Account } from "./components/Account";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -72,6 +73,7 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
             </Route>
+            <Route path="account" element={<Account />} />
             <Route path="community" element={<Community />} />
             <Route
               path="blog"
