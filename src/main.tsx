@@ -44,6 +44,7 @@ import { PreOrders } from "./components/Dashboard/PreOrders";
 import { Inventory } from "./components/Dashboard/Inventory";
 import { BackgroundTaskProvider } from "./contexts/BackgroundTaskContext";
 import { Account } from "./components/Account";
+import { NotFoundPage } from "./components/NotFound";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -184,6 +185,8 @@ createRoot(document.getElementById("root")!).render(
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />{" "}
+            {/* Added NotFound route */}
           </Routes>
         </Router>
       </ShopProvider>

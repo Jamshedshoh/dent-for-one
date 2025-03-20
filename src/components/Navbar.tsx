@@ -7,6 +7,7 @@ import {
   ChevronDown,
   LogOut,
   Settings,
+  ChevronUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -17,11 +18,13 @@ import { useShop } from "../contexts/ShopContext";
 export const Navbar = () => {
   const { user, logout }: any = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useShop();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleProducts = () => setIsProductsOpen(!isProductsOpen);
   const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
 
   const handleLogout = () => {
@@ -32,48 +35,83 @@ export const Navbar = () => {
   return (
     <nav className="bg-white shadow-md py-4 fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link
-            to="/"
-            className="text-2xl font-bold text-blue-600 flex-shrink-0"
-          >
-            Dent
-          </Link>
-
-          {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:block relative w-1/3 mx-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-300 focus:outline-none"
-            />
+        <div className="flex justify-between">
+          <div className="hidden md:flex space-x-6">
+            <Link
+              to="/"
+              className="text-2xl font-bold text-blue-600 flex-shrink-0"
+            >
+              Dent
+            </Link>
+            <div className="flex space-x-4 items-end">
+              <div className="relative">
+                <button
+                  onClick={toggleProducts}
+                  className="text-gray-700 hover:text-blue-600 font-medium flex items-center"
+                >
+                  <span className="mr-2">Products</span>
+                  {isProductsOpen ? (
+                    <ChevronUp className="w-5 h-5 text-gray-700" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-700" />
+                  )}
+                </button>
+                {isProductsOpen && (
+                  <div className="absolute left-0 mt-5 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                    <Link
+                      to="/shop"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProductsOpen(false)}
+                    >
+                      Shop App
+                    </Link>
+                    <Link
+                      to="/social-share"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProductsOpen(false)}
+                    >
+                      Social Share App
+                    </Link>
+                    <Link
+                      to="/booking"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProductsOpen(false)}
+                    >
+                      Booking App
+                    </Link>
+                    <Link
+                      to="/care"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProductsOpen(false)}
+                    >
+                      Care App
+                    </Link>
+                  </div>
+                )}
+              </div>
+              <Link
+                to="/pricing"
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Pricing
+              </Link>
+              <Link
+                to="/community"
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Community
+              </Link>
+              <Link
+                to="/blog"
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Blog
+              </Link>
+            </div>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* User and Cart on the right side */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/shop"
-              className="text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Shop
-            </Link>
-            <Link
-              to="/community"
-              className="text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Community
-            </Link>
-            <Link
-              to="/blog"
-              className="text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Blog
-            </Link>
-
             {/* Cart Icon */}
             <Link
               to="/shop/cart"
@@ -138,13 +176,21 @@ export const Navbar = () => {
               </div>
             )}
           </div>
+        </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center justify-between">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-blue-600 flex-shrink-0"
+          >
+            Dent
+          </Link>
+          <div className="flex space-x-5">
             {/* Cart Icon for Mobile */}
             <Link
               to="/shop/cart"
-              className="text-gray-700 hover:text-blue-600 relative ml-4"
+              className="text-gray-700 hover:text-blue-600 relative"
             >
               <ShoppingCart className="w-6 h-6" />
               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -160,78 +206,35 @@ export const Navbar = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Search - Visible only on mobile */}
-        <div className="md:hidden mt-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-300 focus:outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navigation Menu */}
-      <div
-        className={`md:hidden absolute left-0 right-0 bg-white shadow-lg transition-all duration-300 ease-in-out ${
-          isMenuOpen ? "top-full opacity-100" : "-top-96 opacity-0"
-        }`}
-      >
-        <div className="container mx-auto px-4 py-4 space-y-4">
+        <div
+          className={`md:hidden ${
+            isMenuOpen ? "block" : "hidden"
+          } absolute top-16 right-0 bg-white shadow-lg rounded-lg w-full`}
+        >
           <Link
             to="/shop"
-            className="block text-gray-700 hover:text-blue-600 font-medium"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Shop
           </Link>
           <Link
+            to="/pricing"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+          >
+            Pricing
+          </Link>
+          <Link
             to="/community"
-            className="block text-gray-700 hover:text-blue-600 font-medium"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Community
           </Link>
           <Link
             to="/blog"
-            className="block text-gray-700 hover:text-blue-600 font-medium"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Blog
           </Link>
-
-          <div className="pt-4 border-t border-gray-200">
-            {user ? (
-              <div className="space-y-4">
-                <span className="block text-gray-700 font-medium">
-                  {user.email}
-                </span>
-                <button
-                  className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700"
-                  onClick={logout}
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <Link
-                  to="/login"
-                  className="block w-full px-4 py-2 text-center text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="block w-full px-4 py-2 text-center text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </nav>
