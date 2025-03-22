@@ -43,153 +43,99 @@ import { Discounts } from "./components/Dashboard/Discounts";
 import { PreOrders } from "./components/Dashboard/PreOrders";
 import { Inventory } from "./components/Dashboard/Inventory";
 import { BackgroundTaskProvider } from "./contexts/BackgroundTaskContext";
-import { Account } from "./components/Account";
+import {
+  Account as ShopAccount,
+  Messages as ShopAccountMessages,
+  Orders as ShopAccountOrders,
+  Payments as ShopAccountPayments,
+  Receipts as ShopAccountReceipts,
+  Favorites as ShopAccountFavorites,
+  Settings as ShopAccountSettings,
+} from "./components/Shop/Account";
 import { NotFoundPage } from "./components/NotFound";
+
+export const Providers = ({ children }: any) => (
+  <AuthProvider>
+    <ShopProvider>
+      <BackgroundTaskProvider>
+        <BlogProvider>
+          <OrderProvider>
+            <InventoryProvider>
+              <ProductsProvider>
+                <CategoriesProvider>
+                  <SuppliersProvider>
+                    <OrdersProvider>
+                      <PaymentsProvider>
+                        <DiscountsProvider>
+                          <PreOrdersProvider>{children}</PreOrdersProvider>
+                        </DiscountsProvider>
+                      </PaymentsProvider>
+                    </OrdersProvider>
+                  </SuppliersProvider>
+                </CategoriesProvider>
+              </ProductsProvider>
+            </InventoryProvider>
+          </OrderProvider>
+        </BlogProvider>
+      </BackgroundTaskProvider>
+    </ShopProvider>
+  </AuthProvider>
+);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <ShopProvider>
-        <Router basename="dent">
-          <Routes>
-            <Route index element={<Home />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="shop">
-              <Route index element={<Shop />} />
-              <Route path="catalog" element={<Catalog />} />
-              <Route path="catalog/:category" element={<Catalog />} />
-              <Route
-                path="catalog/:category/:subcategory"
-                element={<Catalog />}
-              />
-              <Route path="products/:id" element={<ProductDetails />} />
-              <Route path="cart" element={<Cart />} />
-              <Route
-                path="checkout"
-                element={
-                  <OrderProvider>
-                    <Checkout />
-                  </OrderProvider>
-                }
-              />
-            </Route>
-            <Route path="account" element={<Account />} />
-            <Route path="community" element={<Community />} />
+    <Providers>
+      <Router basename="dent">
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="shop">
+            <Route index element={<Shop />} />
+            <Route path="catalog" element={<Catalog />} />
+            <Route path="catalog/:category" element={<Catalog />} />
             <Route
-              path="blog"
-              element={
-                <BlogProvider>
-                  <Blog />
-                </BlogProvider>
-              }
+              path="catalog/:category/:subcategory"
+              element={<Catalog />}
             />
-            <Route
-              path="blog/:id"
-              element={
-                <BlogProvider>
-                  <Post />
-                </BlogProvider>
-              }
-            />
-            <Route path="contact" element={<Contact />} />
-            <Route path="patient" element={<Patient />} />
-            <Route path="dentist" element={<Dentist />} />
-            <Route path="business" element={<Business />} />
-            <Route path="dashboard" element={<Dashboard />}>
-              <Route
-                path="overview"
-                element={
-                  <BackgroundTaskProvider>
-                    <Overview />
-                  </BackgroundTaskProvider>
-                }
-              />
-              <Route path="inbox" element={<Inbox />} />
-              <Route
-                path="blog"
-                element={
-                  <BlogProvider>
-                    <BlogDashboard />
-                  </BlogProvider>
-                }
-              />
-              <Route
-                path="shop/products"
-                element={
-                  <ProductsProvider>
-                    <CategoriesProvider>
-                      <Products />
-                    </CategoriesProvider>
-                  </ProductsProvider>
-                }
-              />
-              <Route
-                path="shop/orders"
-                element={
-                  <OrdersProvider>
-                    <Orders />
-                  </OrdersProvider>
-                }
-              />
-              <Route
-                path="shop/payments"
-                element={
-                  <PaymentsProvider>
-                    <Payments />
-                  </PaymentsProvider>
-                }
-              />
-              <Route
-                path="shop/suppliers"
-                element={
-                  <SuppliersProvider>
-                    <Suppliers />
-                  </SuppliersProvider>
-                }
-              />
-              <Route
-                path="shop/categories"
-                element={
-                  <CategoriesProvider>
-                    <Categories />
-                  </CategoriesProvider>
-                }
-              />
-              <Route
-                path="shop/discounts"
-                element={
-                  <DiscountsProvider>
-                    <Discounts />
-                  </DiscountsProvider>
-                }
-              />
-              <Route
-                path="shop/inventory"
-                element={
-                  <InventoryProvider>
-                    <ProductsProvider>
-                      <Inventory />
-                    </ProductsProvider>
-                  </InventoryProvider>
-                }
-              />
-              <Route
-                path="shop/pre-orders"
-                element={
-                  <PreOrdersProvider>
-                    <PreOrders />
-                  </PreOrdersProvider>
-                }
-              />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
+            <Route path="products/:id" element={<ProductDetails />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="account">
+              <Route index element={<ShopAccount />} />
+              <Route path="messages" element={<ShopAccountMessages />} />
+              <Route path="orders" element={<ShopAccountOrders />} />
+              <Route path="payments" element={<ShopAccountPayments />} />
+              <Route path="receipts" element={<ShopAccountReceipts />} />
+              <Route path="favorites" element={<ShopAccountFavorites />} />
+              <Route path="settings" element={<ShopAccountSettings />} />
             </Route>
-            <Route path="*" element={<NotFoundPage />} />{" "}
-            {/* Added NotFound route */}
-          </Routes>
-        </Router>
-      </ShopProvider>
-    </AuthProvider>
+          </Route>
+          <Route path="community" element={<Community />} />
+          <Route path="blog" element={<Blog />} />
+          <Route path="blog/:id" element={<Post />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="patient" element={<Patient />} />
+          <Route path="dentist" element={<Dentist />} />
+          <Route path="business" element={<Business />} />
+          <Route path="dashboard" element={<Dashboard />}>
+            <Route path="overview" element={<Overview />} />
+            <Route path="inbox" element={<Inbox />} />
+            <Route path="blog" element={<BlogDashboard />} />
+            <Route path="shop/products" element={<Products />} />
+            <Route path="shop/orders" element={<Orders />} />
+            <Route path="shop/payments" element={<Payments />} />
+            <Route path="shop/suppliers" element={<Suppliers />} />
+            <Route path="shop/categories" element={<Categories />} />
+            <Route path="shop/discounts" element={<Discounts />} />
+            <Route path="shop/inventory" element={<Inventory />} />
+            <Route path="shop/pre-orders" element={<PreOrders />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+          <Route path="*" element={<NotFoundPage />} />{" "}
+        </Routes>
+      </Router>
+    </Providers>
   </StrictMode>
 );

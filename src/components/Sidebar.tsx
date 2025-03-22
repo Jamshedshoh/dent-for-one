@@ -71,7 +71,7 @@ export const Sidebar = ({ title, isOpen, toggleSidebar }: SidebarProps) => {
             {title}
             <div className="flex items-center space-x-2 text-gray-800">
               <User className="w-4 h-4" />
-              <span className="text-sm text-gray-600">{user.email}</span>
+              <span className="text-sm text-gray-600">{user?.email}</span>
             </div>
           </Link>
 

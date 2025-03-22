@@ -99,7 +99,7 @@ const ProductsSection = () => {
               <div className="p-4">
                 <Link
                   to={card.href}
-                  className={`mt-4 px-6 py-2 outline outline-blue-400 text-blue-400 rounded-lg hover:bg-blue-400 hover:text-white`}
+                  className={`mt-4 px-6 py-2 rounded-lg text-white bg-blue-400 hover:bg-blue-700`}
                 >
                   Learn More
                 </Link>
@@ -203,7 +203,7 @@ const PricingSection = () => {
               <div className="mt-4">
                 <Link
                   to={plan.href}
-                  className={`mt-4 px-6 py-2 outline outline-blue-400 text-blue-400 rounded-lg hover:bg-blue-400 hover:text-white transition-colors`}
+                  className={`mt-4 px-6 py-2 rounded-lg text-white bg-blue-400 hover:bg-blue-700`}
                 >
                   Learn More
                 </Link>

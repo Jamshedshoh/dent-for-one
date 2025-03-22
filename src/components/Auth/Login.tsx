@@ -13,7 +13,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      navigate("/");
       return;
     }
   }, []);
@@ -23,7 +23,7 @@ export const Login = () => {
     setError(null);
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err: any) {
       setError(err.message);
     }

@@ -12,15 +12,15 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import { useAuth } from "../contexts";
-import { useShop } from "../contexts/ShopContext";
+import { useAuth } from "../../contexts";
+import { useShop } from "../../contexts/ShopContext";
 
 // Navbar Component
 export const Navbar = () => {
   const { user, logout }: any = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);  
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { getCartCount } = useShop();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -38,74 +38,23 @@ export const Navbar = () => {
         <div className="flex justify-between">
           <div className="hidden md:flex space-x-6">
             <Link
-              to="/"
+              to="/shop"
               className="text-2xl font-bold text-blue-600 flex-shrink-0"
             >
-              Dent
+              Dent Shop
             </Link>
             <div className="flex space-x-4 items-end">
-              <div className="relative">
-                <button
-                  onClick={toggleProducts}
-                  className="text-gray-700 hover:text-blue-600 font-medium flex items-center"
-                >
-                  <span className="mr-2">Products</span>
-                  {isProductsOpen ? (
-                    <ChevronUp className="w-5 h-5 text-gray-700" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-700" />
-                  )}
-                </button>
-                {isProductsOpen && (
-                  <div className="absolute left-0 mt-5 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
-                    <Link
-                      to="/shop"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsProductsOpen(false)}
-                    >
-                      Shop App
-                    </Link>
-                    <Link
-                      to="/social-share"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsProductsOpen(false)}
-                    >
-                      Social Share App
-                    </Link>
-                    <Link
-                      to="/booking"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsProductsOpen(false)}
-                    >
-                      Booking App
-                    </Link>
-                    <Link
-                      to="/care"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsProductsOpen(false)}
-                    >
-                      Care App
-                    </Link>
-                  </div>
-                )}
-              </div>
               <Link
-                to="/pricing"
+                to="/shop/catalog"
                 className="text-gray-700 hover:text-blue-600 font-medium"
               >
-                Pricing
+                Catalog
               </Link>
               <Link
-                to="/community"
-                className="text-gray-700 hover:text-blue-600 font-medium"
+                to="/shop/sale"
+                className="font-medium text-red-500 bg-yellow-300 rounded px-2"
               >
-                Community
-              </Link>
-              <Link
-                to="/blog"
-                className="text-gray-700 hover:text-blue-600 font-medium"
-              >
-                Blog
+                Sale -50%
               </Link>
             </div>
           </div>
@@ -141,6 +90,14 @@ export const Navbar = () => {
                 {/* Dropdown Menu */}
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                    <Link
+                      to="/shop/account"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Account
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100"
@@ -204,28 +161,16 @@ export const Navbar = () => {
           } absolute top-16 right-0 bg-white shadow-lg rounded-lg w-full`}
         >
           <Link
-            to="/shop"
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+            to="/shop/catalog"
+            className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Shop
+            Catalog
           </Link>
           <Link
-            to="/pricing"
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+            to="/shop/sale"
+            className="font-medium text-red-500 bg-yellow-300 rounded px-2"
           >
-            Pricing
-          </Link>
-          <Link
-            to="/community"
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-          >
-            Community
-          </Link>
-          <Link
-            to="/blog"
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-          >
-            Blog
+            Sale -50%
           </Link>
         </div>
       </div>

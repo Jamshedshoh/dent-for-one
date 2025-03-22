@@ -19,10 +19,10 @@ export const PostCard = ({ post }: PostCardProps) => {
           Published on: {new Date(post.published_at!).toLocaleDateString()}
         </p>
       </div>
-      <div className="p-6 pt-0 flex justify-end">
+      <div className="p-6 pt-0 flex justify-start">
         <Link
           to={`/blog/${post.id}`}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-6 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-700"
         >
           Read More
         </Link>
