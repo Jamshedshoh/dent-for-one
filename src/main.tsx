@@ -52,7 +52,17 @@ import {
   Favorites as ShopAccountFavorites,
   Settings as ShopAccountSettings,
 } from "./components/Shop/Account";
+import {
+  Account as BookingAccount,
+  Messages as BookingAccountMessages,
+  Appointments as BookingAccountAppointments,
+  Schedule as BookingAccountSchedule,
+  Patients as BookingAccountPatients,
+  Notes as BookingAccountNotes,
+  Settings as BookingAccountSettings,
+} from "./components/Booking/Account";
 import { NotFoundPage } from "./components/NotFound";
+import { Booking, Calendar, Dentists } from "./components/Booking";
 
 export const Providers = ({ children }: any) => (
   <AuthProvider>
@@ -109,6 +119,20 @@ createRoot(document.getElementById("root")!).render(
               <Route path="receipts" element={<ShopAccountReceipts />} />
               <Route path="favorites" element={<ShopAccountFavorites />} />
               <Route path="settings" element={<ShopAccountSettings />} />
+            </Route>
+          </Route>
+          <Route path="booking">
+            <Route index element={<Booking />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="dentists" element={<Dentists />} />
+            <Route path="account">
+              <Route index element={<BookingAccount />} />
+              <Route path="messages" element={<BookingAccountMessages />} />
+              <Route path="appointments" element={<BookingAccountAppointments />} />
+              <Route path="schedule" element={<BookingAccountSchedule />} />
+              <Route path="patients" element={<BookingAccountPatients />} />
+              <Route path="notes" element={<BookingAccountNotes />} />
+              <Route path="settings" element={<BookingAccountSettings />} />
             </Route>
           </Route>
           <Route path="community" element={<Community />} />
