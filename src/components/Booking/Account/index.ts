@@ -1,7 +1,8 @@
 export { Messages } from "./Messages";
 export { Settings } from "./Settings";
-export { Patients } from "./Patients";
-export { Notes } from "./Notes";
+export { Treatment } from "./Treatment";
+export { PaymentHistory } from "./PaymentHistory";
+export { Feedback } from "./Feedback";
 export { Appointments } from "./Appointments";
-export { Schedule } from "./Schedule";
+export { Documents } from "./Documents";
 export { Account } from "./Account";

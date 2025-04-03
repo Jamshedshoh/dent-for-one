@@ -56,13 +56,32 @@ import {
   Account as BookingAccount,
   Messages as BookingAccountMessages,
   Appointments as BookingAccountAppointments,
-  Schedule as BookingAccountSchedule,
-  Patients as BookingAccountPatients,
-  Notes as BookingAccountNotes,
+  Documents as BookingAccountDocuments,
+  Treatment as BookingAccountTreatment,
+  PaymentHistory as BookingAccountPaymentHistory,
+  Feedback as BookingAccountFeedback,
   Settings as BookingAccountSettings,
 } from "./components/Booking/Account";
+import {
+  Account as CareAccount,
+  Messages as CareAccountMessages,
+  Planner as CareAccountPlanner,
+  Progress as CareAccountProgress,
+  Programs as CareAccountPrograms,
+  Resources as CareAccountResources,
+} from "./components/Care/Account";
+import {
+  Account as SocialShareAccount,
+  Messages as SocialShareAccountMessages,
+  ContentPool as SocialShareAccountContentPool,
+  Schedule as SocialShareAccountSchedule,
+  ContentCreator as SocialShareAccountContentCreator,
+  Resources as SocialShareAccountResources,
+} from "./components/SocialShare/Account";
 import { NotFoundPage } from "./components/NotFound";
 import { Booking, Calendar, Dentists } from "./components/Booking";
+import { Care, Consultation } from "./components/Care";
+import { SocialShare, Explore } from "./components/SocialShare";
 
 export const Providers = ({ children }: any) => (
   <AuthProvider>
@@ -128,10 +147,52 @@ createRoot(document.getElementById("root")!).render(
             <Route path="account">
               <Route index element={<BookingAccount />} />
               <Route path="messages" element={<BookingAccountMessages />} />
-              <Route path="appointments" element={<BookingAccountAppointments />} />
-              <Route path="schedule" element={<BookingAccountSchedule />} />
-              <Route path="patients" element={<BookingAccountPatients />} />
-              <Route path="notes" element={<BookingAccountNotes />} />
+              <Route
+                path="appointments"
+                element={<BookingAccountAppointments />}
+              />
+              <Route path="documents" element={<BookingAccountDocuments />} />
+              <Route path="treatment" element={<BookingAccountTreatment />} />
+              <Route
+                path="payment-history"
+                element={<BookingAccountPaymentHistory />}
+              />
+              <Route path="feedback" element={<BookingAccountFeedback />} />
+              <Route path="settings" element={<BookingAccountSettings />} />
+            </Route>
+          </Route>
+          <Route path="care">
+            <Route index element={<Care />} />
+            <Route path="consultation" element={<Consultation />} />
+            <Route path="account">
+              <Route index element={<CareAccount />} />
+              <Route path="messages" element={<CareAccountMessages />} />
+              <Route path="planner" element={<CareAccountPlanner />} />
+              <Route path="progress" element={<CareAccountProgress />} />
+              <Route path="programs" element={<CareAccountPrograms />} />
+              <Route path="resources" element={<CareAccountResources />} />
+              <Route path="settings" element={<BookingAccountSettings />} />
+            </Route>
+          </Route>
+          <Route path="social-share">
+            <Route index element={<SocialShare />} />
+            <Route path="explore" element={<Explore />} />
+            <Route path="account">
+              <Route index element={<SocialShareAccount />} />
+              <Route path="messages" element={<SocialShareAccountMessages />} />
+              <Route
+                path="content-pool"
+                element={<SocialShareAccountContentPool />}
+              />
+              <Route path="schedule" element={<SocialShareAccountSchedule />} />
+              <Route
+                path="content-creator"
+                element={<SocialShareAccountContentCreator />}
+              />
+              <Route
+                path="resources"
+                element={<SocialShareAccountResources />}
+              />
               <Route path="settings" element={<BookingAccountSettings />} />
             </Route>
           </Route>

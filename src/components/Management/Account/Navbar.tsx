@@ -58,7 +58,7 @@ export const Navbar = () => {
                 Appointments
               </Link>
               <Link
-                to="/booking/account/treatment"
+                to="/booking/account/treatment-plan"
                 className="text-gray-700 hover:text-blue-600 font-medium"
               >
                 Treatment Plan
