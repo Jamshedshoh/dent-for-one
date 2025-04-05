@@ -88,14 +88,6 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center space-x-6">
             {user ? (
               <Dropdown title={user?.email}>
-                <Link
-                  to="/manage/account"
-                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsUserMenuOpen(false)}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Account
-                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100"
