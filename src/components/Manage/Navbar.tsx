@@ -27,30 +27,60 @@ export const Navbar = () => {
         <div className="flex justify-between">
           <div className="hidden md:flex space-x-6">
             <Link
-              to="/booking"
+              to="/manage"
               className="text-2xl font-bold text-blue-600 flex-shrink-0"
             >
-              Dent Booking
+              Dent Manage
             </Link>
             <div className="flex space-x-4 items-end">
-              <Link
-                to="/booking"
-                className="text-white bg-blue-600 font-medium rounded px-2"
-              >
-                Book
-              </Link>
-              <Link
-                to="/booking/calendar"
-                className="text-gray-700 hover:text-blue-600 font-medium"
-              >
-                Calendar
-              </Link>
-              <Link
-                to="/booking/dentists"
-                className="text-gray-700 hover:text-blue-600 font-medium"
-              >
-                Dentists
-              </Link>
+              <Dropdown title="Users">
+                <Link
+                  to="/manage/users"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Users
+                </Link>
+              </Dropdown>
+              <Dropdown title="Messages">
+                <Link
+                  to="/manage/messages"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Messages
+                </Link>
+              </Dropdown>
+              <Dropdown title="Shop">
+                <Link
+                  to="/manage/shop"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Shop
+                </Link>
+              </Dropdown>
+              <Dropdown title="Booking">
+                <Link
+                  to="/manage/booking"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Booking
+                </Link>
+              </Dropdown>
+              <Dropdown title="Social Share">
+                <Link
+                  to="/manage/social-share"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Social Share
+                </Link>
+              </Dropdown>
+              <Dropdown title="Care">
+                <Link
+                  to="/manage/care"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Care
+                </Link>
+              </Dropdown>
             </div>
           </div>
 
@@ -59,7 +89,7 @@ export const Navbar = () => {
             {user ? (
               <Dropdown title={user?.email}>
                 <Link
-                  to="/booking/account"
+                  to="/manage/account"
                   className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
                   onClick={() => setIsUserMenuOpen(false)}
                 >
@@ -96,10 +126,10 @@ export const Navbar = () => {
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center justify-between">
           <Link
-            to="/booking"
+            to="/manage"
             className="text-2xl font-bold text-blue-600 flex-shrink-0"
           >
-            Dent Booking
+            Dent Manage
           </Link>
           <div className="flex space-x-5">
             <button className="text-gray-700" onClick={toggleMenu}>
@@ -117,22 +147,28 @@ export const Navbar = () => {
           } absolute top-16 right-0 bg-white shadow-lg rounded-lg w-full`}
         >
           <Link
-            to="/booking/appointments"
-            className="text-gray-700 hover:text-blue-600 font-medium"
+            to="/manage/shop"
+            className="text-white bg-blue-600 font-medium rounded px-2"
           >
-            Appointments
+            Shop
           </Link>
           <Link
-            to="/booking/calendar"
+            to="/manage/booking"
             className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Calendar
+            Booking
           </Link>
           <Link
-            to="/booking/patients"
+            to="/manage/social-share"
             className="text-gray-700 hover:text-blue-600 font-medium"
           >
-            Patients
+            Social Share
+          </Link>
+          <Link
+            to="/manage/care"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
+            Care
           </Link>
         </div>
       </div>

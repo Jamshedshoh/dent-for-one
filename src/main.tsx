@@ -82,6 +82,15 @@ import { NotFoundPage } from "./components/NotFound";
 import { Booking, Calendar, Dentists } from "./components/Booking";
 import { Care, Consultation } from "./components/Care";
 import { SocialShare, Explore } from "./components/SocialShare";
+import {
+  Manage,
+  Users as ManageUsers,
+  Messages as ManageMessages,
+  Shop as ManageShop,
+  Booking as ManageBooking,
+  SocialShare as ManageSocialShare,
+  Care as ManageCare,
+} from "./components/Manage";
 
 export const Providers = ({ children }: any) => (
   <AuthProvider>
@@ -195,6 +204,15 @@ createRoot(document.getElementById("root")!).render(
               />
               <Route path="settings" element={<BookingAccountSettings />} />
             </Route>
+          </Route>
+          <Route path="manage">
+            <Route index element={<Manage />} />
+            <Route path="users" element={<ManageUsers />} />
+            <Route path="messages" element={<ManageMessages />} />
+            <Route path="shop" element={<ManageShop />} />
+            <Route path="booking" element={<ManageBooking />} />
+            <Route path="social-share" element={<ManageSocialShare />} />
+            <Route path="care" element={<ManageCare />} />
           </Route>
           <Route path="community" element={<Community />} />
           <Route path="blog" element={<Blog />} />
