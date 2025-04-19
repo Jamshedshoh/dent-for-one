@@ -32,7 +32,7 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-b from-primary/10 to-background">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">SmileWeb Hub</CardTitle>
+          <CardTitle className="text-2xl">Dent</CardTitle>
           <CardDescription>
             Sign in to access your dental care portal
           </CardDescription>
