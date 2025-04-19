@@ -75,7 +75,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <Header title="Shop" />
+      <Header title="Dent Shop" />
 
       <main className="container px-4 py-6">
         <div className="flex items-center justify-between mb-6">

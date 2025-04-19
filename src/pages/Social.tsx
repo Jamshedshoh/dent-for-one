@@ -86,7 +86,7 @@ export default function Social() {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <Header title="Social" />
+      <Header title="Dent Social" />
 
       <main className="container px-4 py-6">
         <div className="flex border-b border-border mb-6">

@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { User, Mail, Phone, MapPin, Award, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileData {
   first_name: string;
@@ -49,23 +50,25 @@ export default function Profile() {
       if (!user) return;
 
       try {
-        // const { data, error } = await supabase
-        //   .from("profiles")
-        //   .select("*")
-        //   .eq("id", user.id)
-        //   .maybeSingle();
-        // if (error) throw error;
-        // if (data) {
-        //   setProfile({
-        //     first_name: data.first_name || "",
-        //     last_name: data.last_name || "",
-        //     email: data.email || user.email || "",
-        //     phone: data.phone || "",
-        //     address: data.address || "",
-        //     birthdate: data.birthdate || "",
-        //     emergency_contact: data.emergency_contact || "",
-        //   });
-        // }
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setProfile({
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            email: data.email || user.email || "",
+            phone: data.phone || "",
+            address: data.address || "",
+            birthdate: data.birthdate || "",
+            emergency_contact: data.emergency_contact || "",
+          });
+        }
       } catch (error: any) {
         console.error("Error fetching profile:", error.message);
         toast.error("Failed to load profile");
@@ -90,21 +93,19 @@ export default function Profile() {
     if (!user) return;
 
     try {
-      // const { error } = await supabase
-      //   .from('profiles')
-      //   .upsert({
-      //     id: user.id,
-      //     first_name: profile.first_name,
-      //     last_name: profile.last_name,
-      //     email: profile.email,
-      //     phone: profile.phone,
-      //     address: profile.address,
-      //     birthdate: profile.birthdate,
-      //     emergency_contact: profile.emergency_contact,
-      //     updated_at: new Date().toISOString()
-      //   });
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        birthdate: profile.birthdate,
+        emergency_contact: profile.emergency_contact,
+        updated_at: new Date().toISOString(),
+      });
 
-      // if (error) throw error;
+      if (error) throw error;
 
       toast.success("Profile updated successfully");
     } catch (error: any) {
@@ -122,8 +123,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pl-16">
-      <SidebarNavigation />
+    <div className="min-h-screen pb-20 md:pb-0">
       <Header />
 
       <main className="container px-4 py-6">

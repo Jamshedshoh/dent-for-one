@@ -91,7 +91,7 @@ export default function Care() {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <Header title="Care" />
+      <Header title="Dent Care" />
 
       <main className="container px-4 py-6">
         <div className="flex justify-between items-center mb-6">

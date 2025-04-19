@@ -102,7 +102,7 @@ export default function Booking() {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <Header title="Booking" />
+      <Header title="Dent Booking" />
       
       <main className="container px-4 py-6">
         {bookingStep === 0 ? (
