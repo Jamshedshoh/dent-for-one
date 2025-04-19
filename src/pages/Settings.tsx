@@ -1,15 +1,33 @@
-
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { SidebarNavigation } from "@/components/SidebarNavigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BellRing, Moon, Globe, Lock, Bell, Shield, LogOut } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  BellRing,
+  Moon,
+  Globe,
+  Lock,
+  Bell,
+  Shield,
+  LogOut,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function Settings() {
@@ -18,13 +36,12 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pl-16">
-      <SidebarNavigation />
+    <div className="min-h-screen pb-20 md:pb-0">
       <Header />
-      
+
       <main className="container px-4 py-6">
         <h2 className="text-2xl font-semibold mb-6">Settings</h2>
-        
+
         <Tabs defaultValue="notifications" className="space-y-6">
           <TabsList className="grid grid-cols-3 md:grid-cols-5 lg:w-[600px]">
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -33,7 +50,7 @@ export default function Settings() {
             <TabsTrigger value="privacy">Privacy</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="notifications" className="space-y-4">
             <Card>
               <CardHeader>
@@ -41,65 +58,87 @@ export default function Settings() {
                   <BellRing className="h-5 w-5" />
                   Notification Preferences
                 </CardTitle>
-                <CardDescription>Configure how and when you receive notifications</CardDescription>
+                <CardDescription>
+                  Configure how and when you receive notifications
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="appointment_reminders">Appointment Reminders</Label>
-                    <p className="text-sm text-muted-foreground">Receive reminders about upcoming appointments</p>
+                    <Label htmlFor="appointment_reminders">
+                      Appointment Reminders
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive reminders about upcoming appointments
+                    </p>
                   </div>
                   <Switch id="appointment_reminders" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="treatment_updates">Treatment Updates</Label>
-                    <p className="text-sm text-muted-foreground">Get notifications about your treatment plan</p>
+                    <p className="text-sm text-muted-foreground">
+                      Get notifications about your treatment plan
+                    </p>
                   </div>
                   <Switch id="treatment_updates" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="product_recommendations">Product Recommendations</Label>
-                    <p className="text-sm text-muted-foreground">Receive personalized product recommendations</p>
+                    <Label htmlFor="product_recommendations">
+                      Product Recommendations
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive personalized product recommendations
+                    </p>
                   </div>
                   <Switch id="product_recommendations" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="dental_tips">Dental Care Tips</Label>
-                    <p className="text-sm text-muted-foreground">Get weekly dental hygiene tips and reminders</p>
+                    <p className="text-sm text-muted-foreground">
+                      Get weekly dental hygiene tips and reminders
+                    </p>
                   </div>
                   <Switch id="dental_tips" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="email_notifications">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+                    <Label htmlFor="email_notifications">
+                      Email Notifications
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive notifications via email
+                    </p>
                   </div>
                   <Switch id="email_notifications" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="push_notifications">Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive push notifications on your device</p>
+                    <Label htmlFor="push_notifications">
+                      Push Notifications
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive push notifications on your device
+                    </p>
                   </div>
                   <Switch id="push_notifications" defaultChecked />
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="appearance" className="space-y-4">
             <Card>
               <CardHeader>
@@ -107,18 +146,22 @@ export default function Settings() {
                   <Moon className="h-5 w-5" />
                   Appearance Settings
                 </CardTitle>
-                <CardDescription>Customize how the application looks</CardDescription>
+                <CardDescription>
+                  Customize how the application looks
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="dark_mode">Dark Mode</Label>
-                    <p className="text-sm text-muted-foreground">Switch between light and dark themes</p>
+                    <p className="text-sm text-muted-foreground">
+                      Switch between light and dark themes
+                    </p>
                   </div>
                   <Switch id="dark_mode" />
                 </div>
                 <Separator />
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="text_size">Text Size</Label>
                   <Select defaultValue="medium">
@@ -135,7 +178,7 @@ export default function Settings() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="language" className="space-y-4">
             <Card>
               <CardHeader>
@@ -143,7 +186,9 @@ export default function Settings() {
                   <Globe className="h-5 w-5" />
                   Language Settings
                 </CardTitle>
-                <CardDescription>Change your preferred language</CardDescription>
+                <CardDescription>
+                  Change your preferred language
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -164,7 +209,7 @@ export default function Settings() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="privacy" className="space-y-4">
             <Card>
               <CardHeader>
@@ -172,34 +217,44 @@ export default function Settings() {
                   <Lock className="h-5 w-5" />
                   Privacy Settings
                 </CardTitle>
-                <CardDescription>Manage your privacy preferences</CardDescription>
+                <CardDescription>
+                  Manage your privacy preferences
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="data_collection">Data Collection</Label>
-                    <p className="text-sm text-muted-foreground">Allow us to collect usage data to improve services</p>
+                    <p className="text-sm text-muted-foreground">
+                      Allow us to collect usage data to improve services
+                    </p>
                   </div>
                   <Switch id="data_collection" defaultChecked />
                 </div>
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="third_party_sharing">Third-Party Sharing</Label>
-                    <p className="text-sm text-muted-foreground">Allow sharing data with trusted partners</p>
+                    <Label htmlFor="third_party_sharing">
+                      Third-Party Sharing
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow sharing data with trusted partners
+                    </p>
                   </div>
                   <Switch id="third_party_sharing" />
                 </div>
                 <Separator />
-                
+
                 <div>
-                  <Button variant="outline" className="w-full">View Privacy Policy</Button>
+                  <Button variant="outline" className="w-full">
+                    View Privacy Policy
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="account" className="space-y-4">
             <Card>
               <CardHeader>
@@ -210,11 +265,20 @@ export default function Settings() {
                 <CardDescription>Manage your account security</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full">Change Password</Button>
-                <Button variant="outline" className="w-full">Two-Factor Authentication</Button>
-                <Button variant="outline" className="w-full">Connected Apps</Button>
+                <Button variant="outline" className="w-full">
+                  Change Password
+                </Button>
+                <Button variant="outline" className="w-full">
+                  Two-Factor Authentication
+                </Button>
+                <Button variant="outline" className="w-full">
+                  Connected Apps
+                </Button>
                 <Separator />
-                <Button variant="destructive" className="w-full flex items-center gap-2">
+                <Button
+                  variant="destructive"
+                  className="w-full flex items-center gap-2"
+                >
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </Button>
@@ -222,12 +286,12 @@ export default function Settings() {
             </Card>
           </TabsContent>
         </Tabs>
-        
+
         <div className="mt-6 flex justify-end">
           <Button onClick={saveSettings}>Save All Settings</Button>
         </div>
       </main>
-      
+
       <BottomNavigation />
     </div>
   );

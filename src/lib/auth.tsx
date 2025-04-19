@@ -1,7 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
@@ -24,27 +23,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-    );
+    // const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    //   (event, session) => {
+    //     setSession(session);
+    //     setUser(session?.user ?? null);
+    //   }
+    // );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+    // supabase.auth.getSession().then(({ data: { session } }) => {
+    //   setSession(session);
+    //   setUser(session?.user ?? null);
+    //   setIsLoading(false);
+    // });
 
-    return () => subscription.unsubscribe();
+    // return () => subscription.unsubscribe();
   }, []);
 
   async function signIn(email: string, password: string) {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // if (error) throw error;
       toast.success("Signed in successfully");
       navigate("/");
     } catch (error: any) {
@@ -54,8 +53,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signUp(email: string, password: string) {
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
+      // const { error } = await supabase.auth.signUp({ email, password });
+      // if (error) throw error;
       toast.success("Account created successfully! Check your email for verification.");
     } catch (error: any) {
       toast.error(error.message || "Error creating account");
@@ -64,8 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signOut() {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // const { error } = await supabase.auth.signOut();
+      // if (error) throw error;
       toast.success("Signed out successfully");
       navigate("/auth");
     } catch (error: any) {

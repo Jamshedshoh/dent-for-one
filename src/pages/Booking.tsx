@@ -1,7 +1,6 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { SidebarNavigation } from "@/components/SidebarNavigation";
 import { Calendar as CalendarIcon, Clock, MapPin, Video, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -102,8 +101,7 @@ export default function Booking() {
   };
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pl-16">
-      <SidebarNavigation />
+    <div className="min-h-screen pb-20 md:pb-0">
       <Header title="Booking" />
       
       <main className="container px-4 py-6">

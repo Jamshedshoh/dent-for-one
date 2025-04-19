@@ -1,8 +1,8 @@
-
 import { Menu, Search, Bell, X } from "lucide-react";
 import { useState } from "react";
 import { SlideOutMenu } from "./SlideOutMenu";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title?: string;
@@ -11,23 +11,29 @@ interface HeaderProps {
   className?: string;
 }
 
-export function Header({ 
-  title = "Smile Well Hub", 
-  showSearch = true, 
+export function Header({
+  title = "Dent App",
+  showSearch = true,
   showNotifications = true,
-  className
+  className,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
-      <header className={cn("sticky top-0 z-40 w-full bg-background/95 backdrop-blur-sm border-b border-border", className)}>
+      <header
+        className={cn(
+          "sticky top-0 z-40 w-full bg-background/95 backdrop-blur-sm border-b border-border",
+          className
+        )}
+      >
         <div className="container flex h-16 items-center justify-between px-4">
           {!searchActive ? (
             <>
               <div className="flex items-center">
-                <button 
+                <button
                   onClick={() => setMenuOpen(true)}
                   className="mr-4 rounded-full p-2 hover:bg-accent"
                 >
@@ -35,19 +41,24 @@ export function Header({
                 </button>
                 <h1 className="text-lg font-semibold">{title}</h1>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 {showSearch && (
-                  <button 
+                  <button
                     onClick={() => setSearchActive(true)}
                     className="rounded-full p-2 hover:bg-accent"
                   >
                     <Search size={22} />
                   </button>
                 )}
-                
+
                 {showNotifications && (
-                  <button className="rounded-full p-2 hover:bg-accent relative">
+                  <button
+                    className="rounded-full p-2 hover:bg-accent relative"
+                    onClick={() => {
+                      navigate("/notifications");
+                    }}
+                  >
                     <Bell size={22} />
                     <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
                   </button>
@@ -56,7 +67,7 @@ export function Header({
             </>
           ) : (
             <div className="w-full flex items-center">
-              <button 
+              <button
                 onClick={() => setSearchActive(false)}
                 className="p-2 mr-2"
               >
