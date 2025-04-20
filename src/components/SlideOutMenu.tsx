@@ -90,7 +90,7 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
           </button>
         </div>
 
-        <div className="flex items-center mb-8 p-3 bg-secondary rounded-lg">
+        {/* <div className="flex items-center mb-8 p-3 bg-secondary rounded-lg">
           <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-medium">
             JS
           </div>
@@ -98,7 +98,7 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
             <p className="font-medium">John Smith</p>
             <p className="text-xs text-muted-foreground">john.smith@example.com</p>
           </div>
-        </div>
+        </div> */}
 
         <div className="space-y-2">
           {menuItems.map((item) => (

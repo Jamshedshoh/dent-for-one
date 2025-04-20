@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import {
@@ -14,14 +15,61 @@ import { Button } from "@/components/ui/button";
 import { Bell, Calendar, Heart, ShoppingBag, Mail, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Notification {
+  id: string;
+  to_user_id: string;
+  type: string;
+  title: string;
+  description: string;
+  isNew: boolean;
+  action: string;
+  isRead: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export default function Notifications() {
-  const markAllRead = () => {
+  const markAllRead = async () => {
+    await supabase
+      .from("notifications")
+      .update({ isRead: true })
+      .eq("isRead", false)
+      .then((response) => {
+        if (response.error) {
+          console.error("Error marking notifications as read:", response.error);
+          toast.error("Failed to mark notifications as read");
+        } else {
+          setNotifications((prevNotifications) =>
+            prevNotifications.map((notification) => ({
+              ...notification,
+              isRead: true,
+            }))
+          );
+        }
+      });
     toast.success("All notifications marked as read");
   };
 
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    let { data: notifications, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) console.log("Error fetching notifications:", error);
+    else setNotifications(notifications);
+  };
+
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
+    <div className="min-h-screen pb-20 md:pb-20">
       <Header />
 
       <main className="container px-4 py-6">
@@ -48,154 +96,148 @@ export default function Notifications() {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">
-                    Recent Notifications
-                  </CardTitle>
-                  <Badge className="bg-primary">3 New</Badge>
+                  <CardTitle>Recent Notifications</CardTitle>
+                  {notifications.filter((i) => i.isNew).length > 0 && (
+                    <Badge className="bg-primary">
+                      {notifications.filter((i) => i.isNew).length} New
+                    </Badge>
+                  )}
                 </div>
                 <CardDescription>
-                  You have 9 unread notifications
+                  You have {notifications.filter((i) => !i.isRead).length}{" "}
+                  unread notifications
                 </CardDescription>
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">
-                          Appointment Reminder
-                        </h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Your dental checkup is scheduled for tomorrow at 2:30 PM
-                        with Dr. Sarah Johnson.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          Today, 9:42 AM
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Care Reminder</h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Time to replace your toothbrush! It's been 3 months
-                        since your last replacement.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          Yesterday, 2:15 PM
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Shop Now
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Special Offer</h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        20% off on all electric toothbrushes this week! Use code
-                        SMILE20 at checkout.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          2 days ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Shop
-                        </Button>
+                {notifications
+                  .filter((i) => !i.isRead)
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="bg-primary/5 p-4 rounded-lg border border-primary/20"
+                    >
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "message" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            {notification.type === "appointment" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "care" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "offer" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                Shop Now
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
 
                 <Separator />
 
-                <div className="p-4 rounded-lg">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">
-                        Treatment Plan Updated
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Dr. Johnson has updated your treatment plan. Please
-                        review the changes.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          1 week ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          View
-                        </Button>
+                {notifications
+                  .filter((i) => i.isRead)
+                  .map((notification) => (
+                    <div key={notification.id} className="p-4 rounded-lg">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "general" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2"
+                            >
+                              {notification.action}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-lg">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">
-                        Appointment Completed
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Your cleaning appointment with Dr. Sarah Johnson has
-                        been completed.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          2 weeks ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Feedback
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  ))}
               </CardContent>
 
               <CardFooter className="flex justify-center border-t pt-4">
@@ -213,60 +255,134 @@ export default function Notifications() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">
-                          Appointment Reminder
-                        </h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
+                {notifications
+                  .filter((i) => !i.isRead && i.type === "appointment")
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="bg-primary/5 p-4 rounded-lg border border-primary/20"
+                    >
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "message" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            {notification.type === "appointment" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "care" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "offer" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                Shop Now
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Your dental checkup is scheduled for tomorrow at 2:30 PM
-                        with Dr. Sarah Johnson.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          Today, 9:42 AM
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          View
-                        </Button>
-                      </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
 
-                <div className="p-4 rounded-lg">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">
-                        Appointment Completed
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Your cleaning appointment with Dr. Sarah Johnson has
-                        been completed.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          2 weeks ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Feedback
-                        </Button>
+                <Separator />
+
+                {notifications
+                  .filter((i) => i.isRead && i.type === "appointment")
+                  .map((notification) => (
+                    <div key={notification.id} className="p-4 rounded-lg">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "general" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2"
+                            >
+                              {notification.action}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
               </CardContent>
             </Card>
           </TabsContent>
@@ -280,56 +396,134 @@ export default function Notifications() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Care Reminder</h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
+                {notifications
+                  .filter((i) => !i.isRead && i.type === "care")
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="bg-primary/5 p-4 rounded-lg border border-primary/20"
+                    >
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "message" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            {notification.type === "appointment" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "care" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "offer" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                Shop Now
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Time to replace your toothbrush! It's been 3 months
-                        since your last replacement.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          Yesterday, 2:15 PM
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Shop Now
-                        </Button>
-                      </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
 
-                <div className="p-4 rounded-lg">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <Heart className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">Flossing Reminder</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Don't forget to floss daily for optimal gum health and
-                        to prevent cavities between teeth.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          3 days ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Tips
-                        </Button>
+                <Separator />
+
+                {notifications
+                  .filter((i) => i.isRead && i.type === "care")
+                  .map((notification) => (
+                    <div key={notification.id} className="p-4 rounded-lg">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "general" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2"
+                            >
+                              {notification.action}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
               </CardContent>
             </Card>
           </TabsContent>
@@ -343,56 +537,134 @@ export default function Notifications() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Special Offer</h4>
-                        <Badge variant="outline" className="text-xs">
-                          New
-                        </Badge>
+                {notifications
+                  .filter((i) => !i.isRead && i.type === "offer")
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="bg-primary/5 p-4 rounded-lg border border-primary/20"
+                    >
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-primary/10 text-primary rounded-full" />
+                          )}
+                          {notification.type === "message" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            {notification.type === "appointment" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "care" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                View
+                              </Button>
+                            )}
+                            {notification.type === "offer" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2"
+                              >
+                                Shop Now
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        20% off on all electric toothbrushes this week! Use code
-                        SMILE20 at checkout.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          2 days ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Shop
-                        </Button>
-                      </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
 
-                <div className="p-4 rounded-lg">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <ShoppingBag className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">Whitening Special</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Book a teeth whitening treatment this month and get a
-                        free take-home kit!
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          1 week ago
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          Book Now
-                        </Button>
+                <Separator />
+
+                {notifications
+                  .filter((i) => i.isRead && i.type === "offer")
+                  .map((notification) => (
+                    <div key={notification.id} className="p-4 rounded-lg">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          {notification.type === "appointment" && (
+                            <Calendar className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "care" && (
+                            <Heart className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "offer" && (
+                            <ShoppingBag className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                          {notification.type === "general" && (
+                            <Mail className="h-10 w-10 p-2 bg-muted text-muted-foreground rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm">
+                              {notification.title}
+                            </h4>
+                            {notification.isNew && (
+                              <Badge variant="outline" className="text-xs">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {notification.description}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(notification.created_at).toDateString()}
+                              &nbsp;&mdash;&nbsp;
+                              {new Date(notification.created_at).toTimeString()}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2"
+                            >
+                              {notification.action}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  ))}
               </CardContent>
             </Card>
           </TabsContent>

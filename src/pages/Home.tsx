@@ -6,8 +6,6 @@ import { RecommendedProducts } from "@/components/RecommendedProducts";
 import { TipsAndReminders } from "@/components/TipsAndReminders";
 
 export default function Home() {
-  // In a real app, you would fetch this from user profile
-  const userName = "John";
   const timeOfDay = getTimeOfDay();
 
   return (
@@ -15,9 +13,7 @@ export default function Home() {
       <Header />
 
       <main className="container px-4 py-6">
-        <h2 className="text-2xl font-semibold mb-6">
-          Good {timeOfDay}, {userName}!
-        </h2>
+        <h2 className="text-2xl font-semibold mb-6">Good {timeOfDay}!</h2>
 
         <QuickActionButtons />
         <DailySnapshotWidget />

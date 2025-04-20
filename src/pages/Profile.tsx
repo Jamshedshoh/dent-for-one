@@ -123,7 +123,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
+    <div className="min-h-screen pb-20 md:pb-20">
       <Header />
 
       <main className="container px-4 py-6">

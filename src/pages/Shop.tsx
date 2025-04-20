@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { SidebarNavigation } from "@/components/SidebarNavigation";
 import { Filter, ShoppingBag, Star, Sparkles } from "lucide-react";
 
 export default function Shop() {
