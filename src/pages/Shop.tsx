@@ -1,76 +1,86 @@
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Filter, ShoppingBag, Star, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  rating: number;
+  image: string;
+  isExpertPick?: boolean;
+  category: string;
+}
 
 export default function Shop() {
-  // In a real app, these would be fetched from an API
-  const categories = [
-    "All",
-    "Toothbrushes",
-    "Toothpaste",
-    "Floss",
-    "Mouthwash",
-    "Whitening",
-  ];
+  // const categories = [
+  //   "All",
+  //   "Toothbrushes",
+  //   "Toothpaste",
+  //   "Floss",
+  //   "Mouthwash",
+  //   "Whitening",
+  // ];
 
-  const products = [
-    {
-      id: "1",
-      name: "Ultra Soft Toothbrush",
-      price: 9.99,
-      rating: 4.8,
-      image:
-        "https://images.unsplash.com/photo-1609587312208-cea54be969e7?q=80&w=2340&auto=format&fit=crop",
-      isExpertPick: true,
-      category: "Toothbrushes",
-    },
-    {
-      id: "2",
-      name: "Whitening Toothpaste",
-      price: 7.99,
-      rating: 4.5,
-      image:
-        "https://images.unsplash.com/photo-1571115355423-1d318bd95e22?q=80&w=2340&auto=format&fit=crop",
-      category: "Toothpaste",
-    },
-    {
-      id: "3",
-      name: "Premium Dental Floss",
-      price: 4.99,
-      rating: 4.7,
-      image:
-        "https://images.unsplash.com/photo-1629311947908-4486ba06d10b?q=80&w=2340&auto=format&fit=crop",
-      category: "Floss",
-    },
-    {
-      id: "4",
-      name: "Antibacterial Mouthwash",
-      price: 11.99,
-      rating: 4.6,
-      image:
-        "https://images.unsplash.com/photo-1612060723358-53fc89cea8e5?q=80&w=2340&auto=format&fit=crop",
-      category: "Mouthwash",
-    },
-    {
-      id: "5",
-      name: "Electric Toothbrush",
-      price: 49.99,
-      rating: 4.9,
-      image:
-        "https://images.unsplash.com/photo-1559591937-95e5a0f2b367?q=80&w=2340&auto=format&fit=crop",
-      isExpertPick: true,
-      category: "Toothbrushes",
-    },
-    {
-      id: "6",
-      name: "Teeth Whitening Kit",
-      price: 29.99,
-      rating: 4.3,
-      image:
-        "https://images.unsplash.com/photo-1606665805732-d15efeea6211?q=80&w=2340&auto=format&fit=crop",
-      category: "Whitening",
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        let { data, error } = await supabase.from("products").select("*");
+
+        if (error) {
+          console.error("Error fetching products:", error);
+        } else {
+          setProducts(data || []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        let { data, error } = await supabase
+          .from("products")
+          .select("category");
+
+        if (error) {
+          console.error("Error fetching categories:", error);
+        } else {
+          const uniqueCategories = [
+            "All",
+            ...new Set(data?.map((product) => product.category)),
+          ];
+          setCategories(uniqueCategories || []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const filteredProducts =
+      selectedCategory === "All"
+        ? products
+        : products.filter((product) => product.category === selectedCategory);
+    setFilteredProducts(filteredProducts);
+  }, [selectedCategory, products]);
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
@@ -95,6 +105,7 @@ export default function Shop() {
                     ? "bg-primary text-white"
                     : "bg-secondary text-secondary-foreground"
                 }`}
+                onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </button>
@@ -103,7 +114,7 @@ export default function Shop() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="bg-card rounded-xl shadow-sm overflow-hidden flex flex-col animate-fade-in"
