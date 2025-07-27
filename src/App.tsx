@@ -18,6 +18,7 @@ import Support from "./pages/Support";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AiHelp from "./pages/AiHelp";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,14 @@ const App = () => (
               }
             />
             <Route
+              path="/booking"
+              element={
+                <ProtectedRoute>
+                  <Booking />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/social"
               element={
                 <ProtectedRoute>
@@ -63,10 +72,10 @@ const App = () => (
               }
             />
             <Route
-              path="/booking"
+              path="/ai-help"
               element={
                 <ProtectedRoute>
-                  <Booking />
+                  <AiHelp />
                 </ProtectedRoute>
               }
             />
