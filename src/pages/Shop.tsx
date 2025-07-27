@@ -1,8 +1,20 @@
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { Filter, ShoppingBag, Star, Sparkles } from "lucide-react";
+import {
+  Filter,
+  ShoppingBag,
+  Star,
+  Sparkles,
+  DollarSign,
+  StarIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Product {
   id: string;
@@ -13,6 +25,12 @@ interface Product {
   image: string;
   isExpertPick?: boolean;
   category: string;
+}
+
+interface FiltersType {
+  price?: string;
+  title?: string;
+  rating?: string;
 }
 
 export default function Shop() {
@@ -30,6 +48,7 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [filters, setFilters] = useState<FiltersType>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -87,14 +106,6 @@ export default function Shop() {
       <Header title="Dent Shop" />
 
       <main className="container px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Dental Products</h2>
-          <button className="p-2 rounded-lg bg-muted flex items-center">
-            <Filter size={18} />
-            <span className="ml-2 text-sm">Filter</span>
-          </button>
-        </div>
-
         <div className="overflow-x-auto mb-6 -mx-4 px-4">
           <div className="flex space-x-2 w-max">
             {categories.map((category, index) => (
@@ -113,7 +124,135 @@ export default function Shop() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex items-center mb-6 space-x-4">
+          <Popover>
+            <PopoverTrigger className="p-2 rounded-lg bg-muted flex items-center">
+              <DollarSign size={18} />
+              <span className="ml-2 text-sm">
+                {filters.price || "Price: Default"}
+              </span>
+            </PopoverTrigger>
+            <PopoverContent className="flex flex-col space-y-2 w-40">
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    price: "Price: Low to High",
+                  }));
+                }}
+              >
+                Low to High
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    price: "Price: High to Low",
+                  }));
+                }}
+              >
+                High to Low
+              </button>
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger className="p-2 rounded-lg bg-muted flex items-center">
+              <Filter size={18} />
+              <span className="ml-2 text-sm">{filters.title || "A to Z"}</span>
+            </PopoverTrigger>
+            <PopoverContent className="flex flex-col space-y-2 w-40">
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    title: "A to Z",
+                  }));
+                }}
+              >
+                A to Z
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    title: "Z to A",
+                  }));
+                }}
+              >
+                Z to A
+              </button>
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger className="p-2 rounded-lg bg-muted flex items-center">
+              <StarIcon size={18} />
+              <span className="ml-2 text-sm">{filters.rating || "> 4.5"}</span>
+            </PopoverTrigger>
+            <PopoverContent className="flex flex-col space-y-2 w-40">
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    rating: "> 4.5",
+                  }));
+                }}
+              >
+                &#62; 4.5
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    rating: "> 3.5",
+                  }));
+                }}
+              >
+                &#62; 3.5
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    rating: "> 2.5",
+                  }));
+                }}
+              >
+                &#62; 2.5
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    rating: "> 1.5",
+                  }));
+                }}
+              >
+                &#62; 1.5
+              </button>
+              <button
+                className="hover:bg-secondary rounded-xl"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    rating: "> 0.5",
+                  }));
+                }}
+              >
+                &#62; 0.5
+              </button>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
@@ -137,20 +276,30 @@ export default function Shop() {
                   {product.name}
                 </h3>
 
-                <div className="flex items-center mt-auto">
-                  <div className="flex items-center bg-muted px-1.5 py-0.5 rounded text-xs">
-                    <Star
-                      size={12}
-                      className="text-amber-500 fill-amber-500 mr-0.5"
-                    />
-                    {product.rating}
+                <div className="flex justify-between">
+                  <div className="flex items-center mt-auto space-x-2">
+                    <div className="flex items-center bg-muted px-1.5 py-0.5 rounded text-md space-x-2">
+                      <span className="font-bold text-xl">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      <span className="font-medium text-sm line-through">
+                        ${(product.price + 5.0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex items-center bg-muted px-1.5 py-0.5 rounded text-md">
+                      <Star
+                        size={12}
+                        className="text-amber-500 fill-amber-500 mr-0.5"
+                      />
+                      {product.rating}
+                    </div>
                   </div>
                   <div className="ml-auto flex items-center">
-                    <span className="font-medium">
-                      ${product.price.toFixed(2)}
-                    </span>
                     <button className="ml-2 p-1.5 bg-primary rounded-full text-white">
-                      <ShoppingBag size={16} />
+                      <span className="flex items-center gap-2 text-sm">
+                        <ShoppingBag size={18} />
+                        Add
+                      </span>
                     </button>
                   </div>
                 </div>
