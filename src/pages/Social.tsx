@@ -51,7 +51,6 @@ import {
 } from "@/lib/supabase-posts";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { AuthStatus } from "@/components/AuthStatus";
 
 export default function Social() {
   const [posts, setPosts] = useState<SupabasePost[]>([]);
@@ -297,7 +296,6 @@ export default function Social() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-xl font-semibold">Share Your Dental Journey</h2>
-            <AuthStatus />
           </div>
           <Dialog
             open={isCreateDialogOpen}
