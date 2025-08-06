@@ -1,12 +1,21 @@
-
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { 
-  User, Settings, BookOpen, X, ChevronRight,
-  Sun, Moon, Bluetooth, Bell, LogOut, Info
+import {
+  Bell,
+  Bluetooth,
+  BookOpen,
+  ChevronRight,
+  Info,
+  LogOut,
+  Moon,
+  Settings,
+  Sun,
+  User,
+  X,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 type MenuItem = {
   icon: React.ElementType;
@@ -36,7 +45,11 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) && isOpen) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
         onClose();
       }
     }
@@ -63,7 +76,7 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
     setIsDarkMode(!isDarkMode);
     // You would add actual theme toggling logic here
   };
-  
+
   const handleMenuItemClick = (path: string) => {
     navigate(path);
     onClose();
@@ -73,7 +86,7 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm transition-all">
-      <div 
+      <div
         ref={menuRef}
         className={cn(
           "fixed top-0 left-0 h-full w-[280px] bg-background p-6 shadow-xl transition-transform animate-slide-in",
@@ -82,7 +95,7 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
       >
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-xl font-semibold">Menu</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-accent transition-colors"
           >
@@ -123,20 +136,24 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
           ))}
         </div>
 
-        <div className="absolute bottom-8 w-[calc(100%-3rem)]">
+        <div className="absolute bottom-20 w-[calc(100%-3rem)]">
           <div className="flex items-center justify-between p-3 rounded-lg hover:bg-accent transition-colors mb-4">
             <div className="flex items-center">
-              {isDarkMode ? <Moon size={18} className="text-primary" /> : <Sun size={18} className="text-primary" />}
+              {isDarkMode ? (
+                <Moon size={18} className="text-primary" />
+              ) : (
+                <Sun size={18} className="text-primary" />
+              )}
               <span className="ml-3">Dark Mode</span>
             </div>
-            <button 
+            <button
               onClick={toggleTheme}
               className={cn(
                 "w-11 h-6 rounded-full relative",
                 isDarkMode ? "bg-primary" : "bg-muted"
               )}
             >
-              <span 
+              <span
                 className={cn(
                   "absolute top-1 h-4 w-4 rounded-full bg-white transition-transform",
                   isDarkMode ? "translate-x-5" : "translate-x-1"
@@ -145,8 +162,8 @@ export function SlideOutMenu({ isOpen, onClose }: SlideOutMenuProps) {
             </button>
           </div>
 
-          <button 
-            className="flex w-full items-center p-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+          <button
+            className="flex w-full items-center p-3 mb-7 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
             onClick={() => {
               // In a real app, you would log the user out here
               toast.success("Signed out successfully");
