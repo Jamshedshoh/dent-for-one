@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { groq } from "../integrations/chatbot/client";
 import {
   ThumbsUp,
   MessageCircle,
@@ -22,6 +23,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+
 import {
   Dialog,
   DialogContent,
@@ -51,7 +53,6 @@ import {
 } from "@/lib/supabase-posts";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-
 export default function Social() {
   const [posts, setPosts] = useState<SupabasePost[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -64,7 +65,6 @@ export default function Social() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-
   // Get current user
   useEffect(() => {
     const getUser = async () => {
@@ -202,20 +202,54 @@ export default function Social() {
     }
 
     setIsGeneratingAI(true);
+    toast.info("AI is improving your content...");
+    console.log("Using AI to improve post:", newPost.content);
+    try {
+      const chatCompletion = await getGroqChatCompletion();
+      // Print the completion returned by the LLM.
+      console.log(chatCompletion.choices[0]?.message?.content || "");
+      // const aiPrompt = `Improve this dental health post: "${newPost.content}"`;
+      // const improvedContent = `✨ ${newPost.content}\n\n💡 Pro tip: Remember to maintain consistent oral hygiene habits for the best results! Your dental health journey is worth celebrating! 🦷`;
 
-    // Simulate AI content generation
-    setTimeout(() => {
-      const aiPrompt = `Improve this dental health post: "${newPost.content}"`;
-      const improvedContent = `✨ ${newPost.content}\n\n💡 Pro tip: Remember to maintain consistent oral hygiene habits for the best results! Your dental health journey is worth celebrating! 🦷`;
+      // setNewPost({
+      //   ...newPost,
+      //   content: improvedContent,
+      // });
 
       setNewPost({
         ...newPost,
-        content: improvedContent,
+        content: `✨ ${chatCompletion.choices[0]?.message?.content}`,
       });
+      async function getGroqChatCompletion() {
+        return groq.chat.completions.create({
+          messages: [
+            // {
+            //   role: "user",
+            //   content: "Explain the importance of fast language models",
+            // },
+            {
+              role: "system",
+              content:
+                "You are a helpful dental health assistant. Improve the following post about dental health, making it more engaging and informative while maintaining the original intent. Add relevant emojis and format it nicely. Prefix with a sparkle emoji (✨) to indicate AI enhancement.",
+            },
+            { role: "user", content: newPost.content },
+          ],
+          model: "llama-3.3-70b-versatile",
+        });
+      }
 
-      setIsGeneratingAI(false);
       toast.success("AI has improved your content!");
-    }, 2000);
+    } catch (error) {
+      console.error("Error improving post:", error);
+      toast.error("Failed to generate AI content. Using fallback.");
+
+      // setNewPost({
+      //   ...newPost,
+      //   content: `✨ ${newPost.content}\n\n💡 Pro tip: Remember to maintain consistent oral hygiene habits for the best results! Your dental health journey is worth celebrating! 🦷`,
+      // });
+    } finally {
+      setIsGeneratingAI(false);
+    }
   };
 
   const openEditDialog = (post: SupabasePost) => {

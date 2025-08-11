@@ -1,24 +1,25 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import AiHelp from "./pages/AiHelp";
+import Auth from "./pages/Auth";
 import { AuthProvider } from "@/lib/auth";
+import Booking from "./pages/Booking";
+import Care from "./pages/Care";
+import Devices from "./pages/Devices";
+import Guide from "./pages/Guide";
 import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Settings from "./pages/Settings";
 import Shop from "./pages/Shop";
 import Social from "./pages/Social";
-import Care from "./pages/Care";
-import Booking from "./pages/Booking";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import Guide from "./pages/Guide";
-import Notifications from "./pages/Notifications";
-import Devices from "./pages/Devices";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import Support from "./pages/Support";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AiHelp from "./pages/AiHelp";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
@@ -55,14 +56,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/social"
-              element={
-                <ProtectedRoute>
-                  <Social />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/social" element={<Social />} />
             <Route
               path="/care"
               element={
