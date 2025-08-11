@@ -111,7 +111,6 @@ export default function Booking() {
 
   // Function to handle booking completion
   const completeBooking = async () => {
-    console.log(newAppointment);
     const { error } = await supabase
       .from("appointments")
       .insert(newAppointment);
