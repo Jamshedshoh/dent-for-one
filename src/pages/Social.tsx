@@ -180,7 +180,20 @@ export default function Social() {
       setPosts((prev) => [createdPost, ...prev]);
       setNewPost({ content: "", image_url: "" });
       setIsCreateDialogOpen(false);
+      toast.success("Post created successfully!");
 
+      // send post to n8n
+      await fetch(import.meta.env.VITE_N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-N8N-Secret": import.meta.env.VITE_N8N_WEBHOOK_SECRET || "",
+        },
+        body: JSON.stringify({
+          event: "post.created",
+          post: createdPost,
+        }),
+      });
       // Also refresh posts from server to ensure consistency
       setTimeout(async () => {
         const postsData = await getPosts(user?.id);
@@ -213,6 +226,17 @@ export default function Social() {
       setEditingPost(null);
       setNewPost({ content: "", image_url: "" });
       setIsEditDialogOpen(false);
+      toast.success("Post updated successfully!");
+      // send post to n8n
+      // after updatedPost
+      await fetch(import.meta.env.VITE_N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-N8N-Secret": import.meta.env.VITE_N8N_WEBHOOK_SECRET || "",
+        },
+        body: JSON.stringify({ event: "post.updated", post: updatedPost }),
+      });
     }
   };
 
@@ -229,7 +253,15 @@ export default function Social() {
     if (success) {
       // Track engagement metrics
       await trackPostEngagement(postId, "view");
-
+      // inside handleLikePost, after success
+      await fetch(import.meta.env.VITE_N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-N8N-Secret": import.meta.env.VITE_N8N_WEBHOOK_SECRET || "",
+        },
+        body: JSON.stringify({ event: "post.liked", postId }),
+      });
       // Update like status immediately
       setPosts((prev) =>
         prev.map((post) => {
@@ -631,6 +663,16 @@ Keep feedback concise and actionable.`;
 
     // Track engagement metrics
     await trackPostEngagement(post.id, "share");
+
+    // inside handleSharePost, before window.open
+    await fetch(import.meta.env.VITE_N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-N8N-Secret": import.meta.env.VITE_N8N_WEBHOOK_SECRET || "",
+      },
+      body: JSON.stringify({ event: "post.shared", postId: post.id, platform }),
+    });
 
     // Open sharing URL in new window
     window.open(shareUrl, "_blank", "width=600,height=400");
