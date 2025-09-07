@@ -18,11 +18,29 @@ import {
   Linkedin,
   Copy,
   ExternalLink,
+  Hash,
+  TrendingUp,
+  Zap,
+  Palette,
+  Target,
+  Lightbulb,
+  Filter,
+  Search,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Dialog,
@@ -39,7 +57,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   getPosts,
@@ -49,10 +66,14 @@ import {
   toggleLike,
   subscribeToPosts,
   subscribeToLikes,
+  getAIAnalytics,
+  trackPostEngagement,
   type Post as SupabasePost,
+  type AIGenerationOptions,
 } from "@/lib/supabase-posts";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+
 export default function Social() {
   const [posts, setPosts] = useState<SupabasePost[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -65,6 +86,17 @@ export default function Social() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [aiOptions, setAiOptions] = useState<AIGenerationOptions>({
+    tone: "professional",
+    includeHashtags: true,
+    optimizeForEngagement: true,
+    targetAudience: "patients",
+    brandVoice: "friendly",
+    contentType: "tip",
+  });
+
   // Get current user
   useEffect(() => {
     const getUser = async () => {
@@ -111,6 +143,18 @@ export default function Social() {
     return () => clearInterval(interval);
   }, [user?.id, posts.length]);
 
+  // Filter posts based on search and filter
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.user_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      selectedFilter === "all" ||
+      (selectedFilter === "ai" && post.is_generated_by_ai) ||
+      (selectedFilter === "my" && post.user_id === user?.id);
+    return matchesSearch && matchesFilter;
+  });
+
   const handleCreatePost = async () => {
     if (!newPost.content.trim()) {
       toast.error("Please enter some content");
@@ -123,6 +167,9 @@ export default function Social() {
       is_generated_by_ai: newPost.content.includes("✨"),
       ai_prompt: newPost.content.includes("✨")
         ? "AI enhanced content"
+        : undefined,
+      ai_generation_options: newPost.content.includes("✨")
+        ? aiOptions
         : undefined,
     };
 
@@ -155,6 +202,9 @@ export default function Social() {
       ai_prompt: newPost.content.includes("✨")
         ? "AI enhanced content"
         : undefined,
+      ai_generation_options: newPost.content.includes("✨")
+        ? aiOptions
+        : undefined,
     };
 
     const updatedPost = await updatePost(editingPost.id, postData);
@@ -177,6 +227,9 @@ export default function Social() {
   const handleLikePost = async (postId: string) => {
     const success = await toggleLike(postId);
     if (success) {
+      // Track engagement metrics
+      await trackPostEngagement(postId, "view");
+
       // Update like status immediately
       setPosts((prev) =>
         prev.map((post) => {
@@ -195,6 +248,71 @@ export default function Social() {
     }
   };
 
+  // Enhanced AI content generation with multiple options
+  const generateAIContent = async (
+    prompt: string,
+    options: AIGenerationOptions
+  ) => {
+    const systemPrompt = `You are a dental health content specialist. Create engaging, informative content based on the user's input.
+
+Tone: ${options.tone}
+Target Audience: ${options.targetAudience}
+Include Hashtags: ${options.includeHashtags ? "Yes" : "No"}
+Optimize for Engagement: ${options.optimizeForEngagement ? "Yes" : "No"}
+
+Guidelines:
+- Use appropriate emojis and formatting
+- Make content engaging and shareable
+- Include relevant dental health tips when appropriate
+- Use hashtags like #DentalHealth #OralCare #DentForOne if requested
+- Keep tone professional but approachable
+- Add sparkle emoji (✨) at the beginning to indicate AI enhancement
+
+Create content that will resonate with the target audience and encourage engagement.`;
+
+    try {
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.7,
+        max_tokens: 300,
+      });
+
+      return chatCompletion.choices[0]?.message?.content || "";
+    } catch (error) {
+      console.error("Error generating AI content:", error);
+      throw error;
+    }
+  };
+
+  // Generate content from scratch
+  const handleGenerateFromScratch = async () => {
+    setIsGeneratingAI(true);
+    toast.info("AI is creating content for you...");
+
+    try {
+      const content = await generateAIContent(
+        "Create an engaging dental health post that would be interesting to share on social media",
+        aiOptions
+      );
+
+      setNewPost({
+        ...newPost,
+        content: content,
+      });
+
+      toast.success("AI has created content for you!");
+    } catch (error) {
+      toast.error("Failed to generate content. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Improve existing content
   const handleUseAIToFix = async () => {
     if (!newPost.content.trim()) {
       toast.error("Please enter some content first");
@@ -203,50 +321,258 @@ export default function Social() {
 
     setIsGeneratingAI(true);
     toast.info("AI is improving your content...");
-    console.log("Using AI to improve post:", newPost.content);
-    try {
-      const chatCompletion = await getGroqChatCompletion();
-      // Print the completion returned by the LLM.
-      console.log(chatCompletion.choices[0]?.message?.content || "");
-      // const aiPrompt = `Improve this dental health post: "${newPost.content}"`;
-      // const improvedContent = `✨ ${newPost.content}\n\n💡 Pro tip: Remember to maintain consistent oral hygiene habits for the best results! Your dental health journey is worth celebrating! 🦷`;
 
-      // setNewPost({
-      //   ...newPost,
-      //   content: improvedContent,
-      // });
+    try {
+      const improvedContent = await generateAIContent(
+        `Improve this dental health post: "${newPost.content}"`,
+        aiOptions
+      );
 
       setNewPost({
         ...newPost,
-        content: `✨ ${chatCompletion.choices[0]?.message?.content}`,
+        content: improvedContent,
       });
-      async function getGroqChatCompletion() {
-        return groq.chat.completions.create({
-          messages: [
-            // {
-            //   role: "user",
-            //   content: "Explain the importance of fast language models",
-            // },
-            {
-              role: "system",
-              content:
-                "You are a helpful dental health assistant. Improve the following post about dental health, making it more engaging and informative while maintaining the original intent. Add relevant emojis and format it nicely. Prefix with a sparkle emoji (✨) to indicate AI enhancement.",
-            },
-            { role: "user", content: newPost.content },
-          ],
-          model: "llama-3.3-70b-versatile",
-        });
-      }
 
       toast.success("AI has improved your content!");
     } catch (error) {
-      console.error("Error improving post:", error);
-      toast.error("Failed to generate AI content. Using fallback.");
+      toast.error("Failed to improve content. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
-      // setNewPost({
-      //   ...newPost,
-      //   content: `✨ ${newPost.content}\n\n💡 Pro tip: Remember to maintain consistent oral hygiene habits for the best results! Your dental health journey is worth celebrating! 🦷`,
-      // });
+  // Generate hashtag suggestions
+  const handleGenerateHashtags = async () => {
+    setIsGeneratingAI(true);
+    toast.info("AI is generating hashtag suggestions...");
+
+    try {
+      const hashtags = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "Generate 5-8 relevant hashtags for dental health content. Return only the hashtags separated by spaces, no additional text.",
+          },
+          { role: "user", content: newPost.content || "dental health post" },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.3,
+        max_tokens: 100,
+      });
+
+      const hashtagText = hashtags.choices[0]?.message?.content || "";
+      setNewPost({
+        ...newPost,
+        content: newPost.content + "\n\n" + hashtagText,
+      });
+
+      toast.success("Hashtags added!");
+    } catch (error) {
+      toast.error("Failed to generate hashtags. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Optimize post for specific platform
+  const handleOptimizeForPlatform = async (platform: string) => {
+    if (!newPost.content.trim()) {
+      toast.error("Please enter some content first");
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    toast.info(`AI is optimizing for ${platform}...`);
+
+    try {
+      const optimizedContent = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `Optimize this dental health post for ${platform}. Consider platform-specific best practices, character limits, and engagement patterns. Keep the original message but adapt it for ${platform} users.`,
+          },
+          { role: "user", content: newPost.content },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.6,
+        max_tokens: 200,
+      });
+
+      setNewPost({
+        ...newPost,
+        content:
+          optimizedContent.choices[0]?.message?.content || newPost.content,
+      });
+
+      toast.success(`Content optimized for ${platform}!`);
+    } catch (error) {
+      toast.error("Failed to optimize content. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Enhanced AI-Powered Content Creation with Professional Tone Control
+  const handleGenerateProfessionalContent = async () => {
+    setIsGeneratingAI(true);
+    toast.info("AI is creating professional content...");
+
+    try {
+      const professionalPrompt = `Create a professional dental health post with the following specifications:
+- Tone: ${aiOptions.tone}
+- Brand Voice: ${aiOptions.brandVoice}
+- Content Type: ${aiOptions.contentType}
+- Target Audience: ${aiOptions.targetAudience}
+- Include trending hashtags: ${aiOptions.includeHashtags ? "Yes" : "No"}
+- Optimize for engagement: ${aiOptions.optimizeForEngagement ? "Yes" : "No"}
+
+Create content that maintains consistent brand voice and professional standards while being engaging and informative.`;
+
+      const content = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a professional dental health content creator. Create engaging, informative, and professional content that maintains consistent brand voice and follows dental industry best practices. Always start with ✨ to indicate AI enhancement.",
+          },
+          { role: "user", content: professionalPrompt },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.7,
+        max_tokens: 400,
+      });
+
+      setNewPost({
+        ...newPost,
+        content: content.choices[0]?.message?.content || "",
+      });
+
+      toast.success("Professional content generated!");
+    } catch (error) {
+      toast.error("Failed to generate professional content. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Smart Hashtag Suggestions with Trending Analysis
+  const handleGenerateTrendingHashtags = async () => {
+    setIsGeneratingAI(true);
+    toast.info("AI is analyzing trending hashtags...");
+
+    try {
+      const hashtagPrompt = `Analyze the following dental health content and generate trending, relevant hashtags:
+Content: "${newPost.content || "dental health post"}"
+
+Requirements:
+- Include 8-12 hashtags
+- Mix trending and evergreen hashtags
+- Consider dental industry trends
+- Include location-based hashtags if relevant
+- Optimize for maximum reach and engagement
+- Return only hashtags separated by spaces, no additional text
+
+Focus on hashtags that are currently trending in the dental health space and will maximize post visibility.`;
+
+      const hashtags = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a social media hashtag specialist for dental health content. Generate trending, relevant hashtags that will maximize post reach and engagement.",
+          },
+          { role: "user", content: hashtagPrompt },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.4,
+        max_tokens: 150,
+      });
+
+      const hashtagText = hashtags.choices[0]?.message?.content || "";
+      setNewPost({
+        ...newPost,
+        content: newPost.content + "\n\n" + hashtagText,
+      });
+
+      toast.success("Trending hashtags added!");
+    } catch (error) {
+      toast.error("Failed to generate trending hashtags. Please try again.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Brand Voice Consistency Checker
+  const handleCheckBrandVoice = async () => {
+    if (!newPost.content.trim()) {
+      toast.error("Please enter some content first");
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    toast.info("AI is analyzing brand voice consistency...");
+
+    try {
+      const brandVoicePrompt = `Analyze the following dental health content for brand voice consistency:
+
+Content: "${newPost.content}"
+
+Current Brand Voice: ${aiOptions.brandVoice}
+Target Tone: ${aiOptions.tone}
+Target Audience: ${aiOptions.targetAudience}
+
+Provide specific feedback on:
+1. Brand voice consistency (1-10 score)
+2. Tone appropriateness
+3. Suggested improvements
+4. Professional standards compliance
+
+Keep feedback concise and actionable.`;
+
+      const analysis = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a brand voice specialist for dental health content. Analyze content for consistency, professionalism, and brand alignment.",
+          },
+          { role: "user", content: brandVoicePrompt },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.3,
+        max_tokens: 200,
+      });
+
+      const feedback = analysis.choices[0]?.message?.content || "";
+
+      // Extract score from feedback (look for "1-10 score" pattern)
+      const scoreMatch = feedback.match(
+        /(\d+(?:\.\d+)?)\s*\/\s*10|score[:\s]*(\d+(?:\.\d+)?)/i
+      );
+      if (scoreMatch) {
+        const score = parseFloat(scoreMatch[1] || scoreMatch[2]);
+        if (!isNaN(score) && score >= 0 && score <= 10) {
+          // Note: Brand voice score is now tracked in AI metadata
+          console.log(`Brand voice score: ${score}/10`);
+          toast.success(`Brand voice score: ${score}/10`, {
+            description: feedback,
+            duration: 8000,
+          });
+        } else {
+          toast.success("Brand voice analysis complete!", {
+            description: feedback,
+            duration: 8000,
+          });
+        }
+      } else {
+        toast.success("Brand voice analysis complete!", {
+          description: feedback,
+          duration: 8000,
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to analyze brand voice. Please try again.");
     } finally {
       setIsGeneratingAI(false);
     }
@@ -261,7 +587,7 @@ export default function Social() {
     setIsEditDialogOpen(true);
   };
 
-  const handleSharePost = (post: SupabasePost, platform: string) => {
+  const handleSharePost = async (post: SupabasePost, platform: string) => {
     const postContent = post.content;
     const postUrl = `${window.location.origin}/social/post/${post.id}`;
     const hashtags = "#DentalHealth #OralCare #DentForOne";
@@ -303,6 +629,9 @@ export default function Social() {
         return;
     }
 
+    // Track engagement metrics
+    await trackPostEngagement(post.id, "share");
+
     // Open sharing URL in new window
     window.open(shareUrl, "_blank", "width=600,height=400");
     toast.success(
@@ -327,9 +656,190 @@ export default function Social() {
       <Header title="Social Share" />
 
       <main className="container px-4 py-6">
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              size={16}
+            />
+            <Input
+              placeholder="Search posts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={selectedFilter} onValueChange={setSelectedFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Posts</SelectItem>
+              <SelectItem value="ai">AI Generated</SelectItem>
+              <SelectItem value="my">My Posts</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* AI Analytics Dashboard */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl mb-6 border border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-blue-900">
+              AI Content Analytics
+            </h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const analytics = await getAIAnalytics();
+                  toast.success(
+                    `Analytics: ${
+                      analytics.totalAIPosts
+                    } AI posts, Avg Engagement: ${analytics.averageEngagement.toFixed(
+                      1
+                    )}%`
+                  );
+                } catch (error) {
+                  toast.error("Failed to load analytics");
+                }
+              }}
+              className="text-blue-700 border-blue-300 hover:bg-blue-100"
+            >
+              <TrendingUp size={14} className="mr-2" />
+              View Analytics
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="bg-white p-3 rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-blue-600">
+                {posts.filter((p) => p.is_generated_by_ai).length}
+              </div>
+              <div className="text-xs text-blue-700">AI Generated</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-purple-600">
+                {
+                  posts.filter(
+                    (p) =>
+                      p.ai_metadata?.brand_voice_score &&
+                      p.ai_metadata.brand_voice_score > 8
+                  ).length
+                }
+              </div>
+              <div className="text-xs text-purple-700">High Quality</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-green-600">
+                {
+                  posts.filter((p) => p.ai_generation_options?.contentType)
+                    .length
+                }
+              </div>
+              <div className="text-xs text-green-700">Categorized</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-orange-600">
+                {posts.length}
+              </div>
+              <div className="text-xs text-orange-700">Total Posts</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced AI Analytics Dashboard */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl mb-6 border border-green-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-green-900">
+              AI Performance Insights
+            </h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const analytics = await getAIAnalytics();
+                  const topTone =
+                    analytics.topPerformingTones[0]?.tone || "N/A";
+                  const topVoice =
+                    analytics.topPerformingBrandVoices[0]?.voice || "N/A";
+                  const topHashtag =
+                    analytics.hashtagPerformance[0]?.hashtag || "N/A";
+
+                  toast.success(
+                    `Top Performers: Tone: ${topTone}, Voice: ${topVoice}, Hashtag: ${topHashtag}`,
+                    { duration: 8000 }
+                  );
+                } catch (error) {
+                  toast.error("Failed to load performance insights");
+                }
+              }}
+              className="text-green-700 border-green-300 hover:bg-green-100"
+            >
+              <Zap size={14} className="mr-2" />
+              Performance Insights
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="bg-white p-3 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-green-600">
+                {
+                  posts.filter(
+                    (p) =>
+                      p.ai_metadata?.confidence_score &&
+                      p.ai_metadata.confidence_score > 0.8
+                  ).length
+                }
+              </div>
+              <div className="text-xs text-green-700">High Confidence</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-emerald-600">
+                {
+                  posts.filter(
+                    (p) =>
+                      p.ai_metadata?.engagement_prediction_score &&
+                      p.ai_metadata.engagement_prediction_score > 0.7
+                  ).length
+                }
+              </div>
+              <div className="text-xs text-emerald-700">High Engagement</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-teal-600">
+                {
+                  posts.filter(
+                    (p) =>
+                      p.ai_metadata?.content_quality_score &&
+                      p.ai_metadata.content_quality_score > 0.85
+                  ).length
+                }
+              </div>
+              <div className="text-xs text-teal-700">Premium Quality</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-cyan-600">
+                {
+                  posts.filter(
+                    (p) =>
+                      p.ai_metadata?.hashtag_relevance_score &&
+                      p.ai_metadata.hashtag_relevance_score > 0.75
+                  ).length
+                }
+              </div>
+              <div className="text-xs text-cyan-700">Relevant Hashtags</div>
+            </div>
+          </div>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-xl font-semibold">Share Your Dental Journey</h2>
+            <p className="text-sm text-muted-foreground">
+              {filteredPosts.length} posts •{" "}
+              {posts.filter((p) => p.is_generated_by_ai).length} AI enhanced
+            </p>
           </div>
           <Dialog
             open={isCreateDialogOpen}
@@ -341,7 +851,7 @@ export default function Social() {
                 Create Post
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
                 <DialogTitle>Create New Post</DialogTitle>
                 <DialogDescription>
@@ -349,6 +859,171 @@ export default function Social() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
+                {/* AI Generation Options */}
+                <div className="bg-muted/50 p-4 rounded-lg space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Bot size={16} className="text-primary" />
+                    <h4 className="font-medium">AI Content Assistant</h4>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="tone">Tone</Label>
+                      <Select
+                        value={aiOptions.tone}
+                        onValueChange={(
+                          value:
+                            | "professional"
+                            | "casual"
+                            | "educational"
+                            | "motivational"
+                        ) => setAiOptions((prev) => ({ ...prev, tone: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="professional">
+                            Professional
+                          </SelectItem>
+                          <SelectItem value="casual">Casual</SelectItem>
+                          <SelectItem value="educational">
+                            Educational
+                          </SelectItem>
+                          <SelectItem value="motivational">
+                            Motivational
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="audience">Target Audience</Label>
+                      <Select
+                        value={aiOptions.targetAudience}
+                        onValueChange={(
+                          value: "patients" | "professionals" | "general"
+                        ) =>
+                          setAiOptions((prev) => ({
+                            ...prev,
+                            targetAudience: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="patients">Patients</SelectItem>
+                          <SelectItem value="professionals">
+                            Professionals
+                          </SelectItem>
+                          <SelectItem value="general">General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="brandVoice">Brand Voice</Label>
+                      <Select
+                        value={aiOptions.brandVoice}
+                        onValueChange={(
+                          value:
+                            | "friendly"
+                            | "authoritative"
+                            | "caring"
+                            | "modern"
+                        ) =>
+                          setAiOptions((prev) => ({
+                            ...prev,
+                            brandVoice: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="friendly">Friendly</SelectItem>
+                          <SelectItem value="authoritative">
+                            Authoritative
+                          </SelectItem>
+                          <SelectItem value="caring">Caring</SelectItem>
+                          <SelectItem value="modern">Modern</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="contentType">Content Type</Label>
+                      <Select
+                        value={aiOptions.contentType}
+                        onValueChange={(
+                          value:
+                            | "tip"
+                            | "story"
+                            | "educational"
+                            | "promotional"
+                            | "community"
+                        ) =>
+                          setAiOptions((prev) => ({
+                            ...prev,
+                            contentType: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tip">Tip</SelectItem>
+                          <SelectItem value="story">Story</SelectItem>
+                          <SelectItem value="educational">
+                            Educational
+                          </SelectItem>
+                          <SelectItem value="promotional">
+                            Promotional
+                          </SelectItem>
+                          <SelectItem value="community">Community</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="hashtags"
+                        checked={aiOptions.includeHashtags}
+                        onCheckedChange={(checked) =>
+                          setAiOptions((prev) => ({
+                            ...prev,
+                            includeHashtags: checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="hashtags">Include Hashtags</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="engagement"
+                        checked={aiOptions.optimizeForEngagement}
+                        onCheckedChange={(checked) =>
+                          setAiOptions((prev) => ({
+                            ...prev,
+                            optimizeForEngagement: checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="engagement">
+                        Optimize for Engagement
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid gap-2">
                   <Textarea
                     placeholder="What's on your mind about dental health?"
@@ -358,7 +1033,31 @@ export default function Social() {
                     }
                     className="min-h-[120px]"
                   />
-                  <div className="flex gap-2">
+
+                  {/* AI Action Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateProfessionalContent}
+                      disabled={isGeneratingAI}
+                      className="flex items-center gap-2"
+                    >
+                      <Target size={14} />
+                      {isGeneratingAI
+                        ? "Generating..."
+                        : "Professional Content"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateFromScratch}
+                      disabled={isGeneratingAI}
+                      className="flex items-center gap-2"
+                    >
+                      <Lightbulb size={14} />
+                      {isGeneratingAI ? "Generating..." : "Generate Content"}
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -367,17 +1066,74 @@ export default function Social() {
                       className="flex items-center gap-2"
                     >
                       <Sparkles size={14} />
-                      {isGeneratingAI ? "Generating..." : "Use AI to fix"}
+                      {isGeneratingAI ? "Improving..." : "Improve Content"}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={handleGenerateTrendingHashtags}
+                      disabled={isGeneratingAI}
                       className="flex items-center gap-2"
                     >
-                      <ImageIcon size={14} />
-                      Add Image
+                      <TrendingUp size={14} />
+                      {isGeneratingAI ? "Analyzing..." : "Trending Hashtags"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateHashtags}
+                      disabled={isGeneratingAI}
+                      className="flex items-center gap-2"
+                    >
+                      <Hash size={14} />
+                      {isGeneratingAI ? "Generating..." : "Add Hashtags"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCheckBrandVoice}
+                      disabled={isGeneratingAI || !newPost.content.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      <Palette size={14} />
+                      {isGeneratingAI ? "Analyzing..." : "Check Brand Voice"}
                     </Button>
                   </div>
+
+                  {/* Platform Optimization Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOptimizeForPlatform("Instagram")}
+                      disabled={isGeneratingAI || !newPost.content.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      <Instagram size={14} />
+                      Optimize for Instagram
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOptimizeForPlatform("Twitter")}
+                      disabled={isGeneratingAI || !newPost.content.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      <Twitter size={14} />
+                      Optimize for Twitter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOptimizeForPlatform("LinkedIn")}
+                      disabled={isGeneratingAI || !newPost.content.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      <Linkedin size={14} />
+                      Optimize for LinkedIn
+                    </Button>
+                  </div>
+
                   {newPost.content.includes("✨") && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Bot size={12} />
@@ -415,14 +1171,16 @@ export default function Social() {
           </div>
         ) : (
           <div className="space-y-6">
-            {posts.length === 0 ? (
+            {filteredPosts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">
-                  No posts yet. Be the first to share!
+                  {searchTerm || selectedFilter !== "all"
+                    ? "No posts match your filters."
+                    : "No posts yet. Be the first to share!"}
                 </p>
               </div>
             ) : (
-              posts.map((post) => (
+              filteredPosts.map((post) => (
                 <div
                   key={post.id}
                   className="bg-card rounded-xl shadow-sm overflow-hidden animate-fade-in"
